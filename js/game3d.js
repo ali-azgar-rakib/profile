@@ -1219,7 +1219,7 @@ function panelFor(n) {
   if (n.kind === 'project') {
     const p = n.project, m = String(p.video || '').match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([\w-]{6,})/), vid = m ? m[1] : '';
     const media = vid ? `<div class="media"><iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(vid)}?rel=0" title="${esc(p.title)} trailer" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen loading="lazy"></iframe></div>`
-      : p.image ? `<div class="media"><img src="${esc(safeUrl(p.image))}" alt="${esc(p.title)}"></div>` : '';
+      : p.image ? `<div class="media" style="pointer-events:none"><img src="${esc(safeUrl(p.image))}" alt="${esc(p.title)} gameplay" onerror="this.parentElement.remove()"></div>` : '';
     return `${media}${intro}<h2 id="panelTitle">${esc(p.title)}</h2><p class="sub">${esc([p.role, p.genre].filter(Boolean).join(' · '))}</p><p>${esc(p.description || '')}</p>
       ${p.highlights && p.highlights.length ? `<h3>MY CONTRIBUTIONS</h3>${bullets(p.highlights)}` : ''}${tags(p.tech)}<div class="btnrow">${linkBtns(p.links)}</div>`;
   }

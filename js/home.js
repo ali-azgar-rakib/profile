@@ -84,9 +84,13 @@ const experience = !CV.experience.length ? '' : section('experience', 'Career', 
 const ytId = v => { v = String(v || '').trim(); const m = v.match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([\w-]{6,})/); return m ? m[1] : v; };
 const projects = !CV.projects.length ? '' : section('projects', 'Selected work', 'Projects', `<div class="projects${CV.projects.length === 1 ? ' one' : ''}">${CV.projects.map((p, i) => {
   const vid = p.video ? ytId(p.video) : '';
+  const imgs = (p.images && p.images.length ? p.images : p.image ? [p.image] : []).map(safeUrl).filter(Boolean);
   const media = vid
-    ? `<button type="button" class="pmedia" data-yt="${esc(vid)}" aria-label="Play the ${esc(p.title)} trailer"><img src="${esc(safeUrl(p.image) || `https://i.ytimg.com/vi/${vid}/hqdefault.jpg`)}" alt="${esc(p.title)} trailer thumbnail" loading="lazy" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/${esc(vid)}/hqdefault.jpg'"><span class="pplay" aria-hidden="true"></span><span class="plabel">Watch trailer</span></button>`
-    : p.image ? `<div class="pmedia"><img src="${esc(safeUrl(p.image))}" alt="${esc(p.title)} screenshot" loading="lazy"></div>` : '';
+    ? `<button type="button" class="pmedia" data-yt="${esc(vid)}" aria-label="Play the ${esc(p.title)} trailer"><img src="${esc(safeUrl(p.image) || `https://i.ytimg.com/vi/${vid}/hqdefault.jpg`)}" alt="${esc(p.title)} trailer thumbnail" loading="lazy"><span class="pplay" aria-hidden="true"></span><span class="plabel">Watch trailer</span></button>`
+    : imgs.length ? `<div class="pgallery">
+        <div class="pmedia still"><img src="${esc(imgs[0])}" alt="${esc(p.title)} gameplay" loading="lazy" onerror="this.closest('.pgallery').remove()"></div>
+        ${imgs.length > 1 ? `<div class="pthumbs">${imgs.slice(1).map(u => `<img src="${esc(u)}" alt="${esc(p.title)} gameplay" loading="lazy" onerror="this.remove()">`).join('')}</div>` : ''}
+      </div>` : '';
   return `<article class="proj${CV.projects.length === 1 || i === 0 ? ' feature' : ''}">${media}
     <div class="pb"><p class="meta2">${esc([p.year, p.role].filter(Boolean).join(' · '))}</p><h3>${esc(p.title)}</h3>
     ${p.genre ? `<p class="genre">${esc(p.genre)}</p>` : ''}
