@@ -140,6 +140,7 @@ p { margin: 0; }
 button.pmedia { cursor: pointer; background: #0d1312; }
 .pgallery { pointer-events: none; user-select: none; -webkit-user-select: none; }
 .pgallery img { -webkit-user-drag: none; }
+.pmedia.still img { object-position: 22% 40%; }
 .pthumbs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; padding: 4px; background: var(--surface); border-bottom: 1px solid var(--line); }
 .pthumbs:empty { display: none; }
 .pthumbs img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block; border-radius: 6px; max-width: 100%; background: var(--accent-soft); }

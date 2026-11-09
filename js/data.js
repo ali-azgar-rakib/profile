@@ -143,18 +143,11 @@ window.CV = {
         "Implemented player abilities on top of GAS"
       ],
       tech: ["Unreal Engine", "GAS", "AI", "Abilities"],
-      // gameplay images from the official site (shown as a still gallery; hidden if they fail to load)
-      image: "https://playpixo.gg/image/13.png",
-      images: [
-        "https://playpixo.gg/image/13.png",
-        "https://playpixo.gg/image/14.png",
-        "https://playpixo.gg/image/15.png",
-        "https://playpixo.gg/image/17.png"
-      ],
+      image: "assets/pixo-cover.jpg",   // cover art
+      images: ["assets/pixo-cover.jpg"],
       video: "",
       links: [
-        { label: "Official website", url: "https://playpixo.gg/" },
-        { label: "Download the demo", url: "https://playpixo.gg/PixoGame.zip" }
+        { label: "Official website", url: "https://playpixo.gg/" }
       ]
     }
   ],
