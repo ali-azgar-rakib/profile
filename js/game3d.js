@@ -15,7 +15,7 @@ const lerp = (a, b, t) => a + (b - a) * t;
 const smooth = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const safeUrl = u => { u = String(u || '').trim(); return /^(javascript|data|vbscript):/i.test(u) ? '' : u; };
-const initials = s => String(s || '?').split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase();
+const initials = s => { const w = String(s || '?').split(/\s+/).filter(Boolean); return ((w[0] || '?')[0] + (w.length > 1 ? w[w.length - 1][0] : '')).toUpperCase(); };
 function rng(seed) { return () => { seed = (seed + 0x6D2B79F5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
 const R = rng(20251109);
 const store = {
@@ -611,15 +611,44 @@ addEventListener('mousemove', e => {
 });
 addEventListener('mouseup', () => { if (dragLook && mdown) { if (mdown.moved < 6) fireQueued = true; mdown = null; } });
 
-// touch: left joystick, right half looks, buttons fire/jump
+// touch: a floating joystick appears wherever the left thumb lands; the right side looks around,
+// and a quick tap on a character tags it directly.
 const joyEl = $('#joy'), joyKnob = joyEl.querySelector('i');
-joyEl.addEventListener('pointerdown', e => { e.preventDefault(); audio.ensure(); joy.id = e.pointerId; const r = joyEl.getBoundingClientRect(); joy.ox = r.left + r.width / 2; joy.oy = r.top + r.height / 2; joyEl.setPointerCapture(e.pointerId); moveJoy(e); });
-joyEl.addEventListener('pointermove', e => { if (e.pointerId === joy.id) moveJoy(e); });
-['pointerup', 'pointercancel'].forEach(t => joyEl.addEventListener(t, e => { if (e.pointerId === joy.id) { joy.id = null; joy.x = joy.y = 0; joyKnob.style.transform = ''; } }));
-function moveJoy(e) { let dx = e.clientX - joy.ox, dy = e.clientY - joy.oy; const m = Math.hypot(dx, dy), max = 46; if (m > max) { dx *= max / m; dy *= max / m; } joy.x = dx / max; joy.y = dy / max; joyKnob.style.transform = `translate(${dx}px,${dy}px)`; }
-canvas.addEventListener('pointerdown', e => { if (!isTouch || state !== 'play' || e.pointerType === 'mouse') return; look.id = e.pointerId; look.x = e.clientX; look.y = e.clientY; look.t = performance.now(); look.moved = 0; });
-canvas.addEventListener('pointermove', e => { if (e.pointerId !== look.id) return; const dx = e.clientX - look.x, dy = e.clientY - look.y; look.moved += Math.abs(dx) + Math.abs(dy); look.x = e.clientX; look.y = e.clientY; player.yaw -= dx * 0.006; player.pitch = clamp(player.pitch - dy * 0.006, -1.4, 1.4); });
-['pointerup', 'pointercancel'].forEach(t => canvas.addEventListener(t, e => { if (e.pointerId === look.id) { if (look.moved < 8 && performance.now() - look.t < 300) fireQueued = true; look.id = null; } }));
+let tapAt = null;
+function placeJoy(x, y) { joyEl.style.left = (x - 64) + 'px'; joyEl.style.top = (y - 64) + 'px'; joyEl.style.bottom = 'auto'; joyEl.classList.add('live'); }
+function resetJoy() { joy.id = null; joy.x = joy.y = 0; joyKnob.style.transform = ''; joyEl.classList.remove('live'); joyEl.style.left = joyEl.style.top = joyEl.style.bottom = ''; }
+function moveJoy(e) { let dx = e.clientX - joy.ox, dy = e.clientY - joy.oy; const m = Math.hypot(dx, dy), max = 50; if (m > max) { dx *= max / m; dy *= max / m; } joy.x = dx / max; joy.y = dy / max; joyKnob.style.transform = `translate(${dx}px,${dy}px)`; }
+function touchStart(e) {
+  if (e.pointerType === 'mouse' || state !== 'play') return;
+  e.preventDefault(); audio.ensure();
+  const leftZone = e.clientX < innerWidth * (innerWidth > innerHeight ? 0.42 : 0.5) && e.clientY > innerHeight * 0.35;
+  if (leftZone && joy.id === null) {
+    joy.id = e.pointerId; joy.ox = e.clientX; joy.oy = e.clientY; placeJoy(e.clientX, e.clientY); moveJoy(e);
+  } else if (look.id === null) {
+    look.id = e.pointerId; look.x = e.clientX; look.y = e.clientY; look.t = performance.now(); look.moved = 0; look.sx = e.clientX; look.sy = e.clientY;
+  }
+}
+function touchMove(e) {
+  if (e.pointerId === joy.id) { moveJoy(e); return; }
+  if (e.pointerId !== look.id) return;
+  const dx = e.clientX - look.x, dy = e.clientY - look.y, sens = lookSens();
+  look.moved += Math.abs(dx) + Math.abs(dy); look.x = e.clientX; look.y = e.clientY;
+  player.yaw -= dx * sens; player.pitch = clamp(player.pitch - dy * sens, -1.35, 1.35);
+}
+function touchEnd(e) {
+  if (e.pointerId === joy.id) { resetJoy(); return; }
+  if (e.pointerId !== look.id) return;
+  if (look.moved < 10 && performance.now() - look.t < 320) tapAt = { x: look.sx, y: look.sy };
+  look.id = null;
+}
+const lookSens = () => 0.0055 * (720 / Math.max(360, Math.min(innerWidth, innerHeight * 1.8)));
+if (isTouch) {
+  [canvas, joyEl].forEach(el => { el.addEventListener('pointerdown', touchStart); });
+  addEventListener('pointermove', touchMove, { passive: true });
+  ['pointerup', 'pointercancel'].forEach(t => addEventListener(t, touchEnd));
+  document.addEventListener('gesturestart', e => e.preventDefault());
+  document.addEventListener('touchmove', e => { if (state === 'play') e.preventDefault(); }, { passive: false });
+}
 [['#tFire', () => { fireQueued = true; }], ['#tJump', () => { jumpPressed = true; }]].forEach(([s, fn]) => {
   const b = $(s); b.addEventListener('pointerdown', e => { e.preventDefault(); audio.ensure(); b.classList.add('on'); fn(); });
   ['pointerup', 'pointercancel', 'pointerleave'].forEach(t => b.addEventListener(t, () => b.classList.remove('on')));
@@ -676,14 +705,36 @@ function updatePlayer(dt) {
   const bobY = player.onGround ? Math.sin(player.bob * 2) * 0.05 * Math.min(1, moving / 6) : 0;
   camera.position.set(player.pos.x, player.pos.y + EYE + bobY, player.pos.z);
   camera.rotation.set(player.pitch, player.yaw, 0);
-  gun.position.set(0.25 + Math.cos(player.bob) * 0.01 * Math.min(1, moving / 6), -0.21 + Math.abs(Math.sin(player.bob)) * 0.006 + recoil * 0.015, -0.62 + recoil * 0.05);
+  gun.position.set((camera.aspect < 1 ? 0.12 : 0.25) + Math.cos(player.bob) * 0.01 * Math.min(1, moving / 6), -0.21 + Math.abs(Math.sin(player.bob)) * 0.006 + recoil * 0.015, -0.62 + recoil * 0.05);
   gun.rotation.x = recoil * 0.25;
 }
 
-function fire() {
+// on touch screens, a shot near a character snaps onto it (within ~9 degrees and line of sight)
+function assistTarget(dirRay, maxAngle) {
+  let best = null, bestA = maxAngle;
+  for (const n of npcs) {
+    tmpV.copy(n.group.position); tmpV.y += n.height * 0.45;
+    const d = tmpV.distanceTo(dirRay.origin); if (d > 75) continue;
+    tmpV.sub(dirRay.origin).normalize();
+    const ang = Math.acos(clamp(tmpV.dot(dirRay.direction), -1, 1)) - Math.atan(0.9 / d);
+    if (ang < bestA) {
+      ray.set(dirRay.origin, tmpV.clone()); ray.far = d;
+      const block = ray.intersectObjects(blockers, false)[0]; ray.far = 160;
+      if (!block || block.distance > d - 1) { bestA = ang; best = n; }
+    }
+  }
+  return best;
+}
+const _ndc = new THREE.Vector2();
+function fire(screen) {
   if (shotCD > 0) return; shotCD = 0.2; recoil = 1; player.shots++;
   audio.shot(); muzzleFlash.material.opacity = 1;
-  ray.setFromCamera(CENTER, camera);
+  if (screen) { _ndc.set(screen.x / innerWidth * 2 - 1, -(screen.y / innerHeight) * 2 + 1); ray.setFromCamera(_ndc, camera); }
+  else ray.setFromCamera(CENTER, camera);
+  if (isTouch) {
+    const base = ray.ray.clone(), t = assistTarget(base, screen ? 0.2 : 0.16);
+    if (t) { tmpV2.copy(t.group.position); tmpV2.y += t.height * 0.45; ray.set(base.origin, tmpV2.sub(base.origin).normalize()); }
+  }
   const hits = ray.intersectObjects(npcHitMeshes.concat(blockers), false);
   muzzleFlash.getWorldPosition(tmpV);
   const h = hits[0];
@@ -851,7 +902,7 @@ function panelContact(intro = '') {
 }
 function panelHelp() {
   const rows = isTouch
-    ? [['Left stick', 'Walk (push all the way to run)'], ['Drag right side', 'Look around'], ['● button / tap', 'Shoot the tag blaster'], ['▲ button', 'Jump']]
+    ? [['Left thumb', 'Touch anywhere on the left to walk (push far to run)'], ['Right thumb', 'Drag to look around'], ['Tap a character', 'Tags it (aim assist helps)'], ['● button', 'Shoot at the crosshair'], ['▲ button', 'Jump'], ['⛶', 'Full screen']]
     : [['W A S D', 'Walk'], ['Mouse', 'Look around'], ['Click', 'Shoot the tag blaster'], ['Shift', 'Run'], ['Space', 'Jump'], ['M', 'Sound on / off'], ['Esc', 'Release the mouse']];
   return `<p class="kicker">HOW TO PLAY</p><h2 id="panelTitle">Tag the village</h2>
     <p>Every villager and animal carries something: a sign, a case, a crate, a book or a letter. Each one is part of my CV. Tag them with the blaster to read it. The gold <b>?</b> markers and the map show who you haven't found yet. Nobody gets hurt; they just jump.</p>
@@ -880,7 +931,7 @@ modal.addEventListener('click', e => { if (e.target.closest('[data-close]')) clo
 const titleEl = $('#title'), pauseEl = $('#pause'), endEl = $('#end');
 function renderTitle(ready) {
   const keysHtml = isTouch
-    ? `<span>Left stick: walk</span><span>Drag: look</span><span>● : shoot</span>`
+    ? `<span>Left thumb: walk</span><span>Right thumb: look</span><span>Tap a character or ●: tag</span><span>▲: jump</span>`
     : `<span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> walk</span><span><kbd>MOUSE</kbd> look</span><span><kbd>CLICK</kbd> tag</span><span><kbd>SHIFT</kbd> run</span><span><kbd>SPACE</kbd> jump</span>`;
   titleEl.innerHTML = `<div class="screen-inner">
     <p class="eyebrow">A PLAYABLE CV · 3D</p>
@@ -892,7 +943,7 @@ function renderTitle(ready) {
       <a class="ghostbig" href="index.html" style="text-decoration:none">📄 RESUME PAGE</a>
     </div>
     <div class="keys">${keysHtml}</div>
-    <p class="note">Works best in Chrome, Edge or Firefox. On phones, turn sideways.</p></div>`;
+    <p class="note">${isTouch ? 'Tip: turn your phone sideways for the best view.' : 'Works best in Chrome, Edge or Firefox.'}</p></div>`;
   if (ready) $('#btnStart').addEventListener('click', startGame);
 }
 let playTime = 0, endShown = false; const SPAWN = new THREE.Vector3();
@@ -904,8 +955,17 @@ function startGame() {
   state = 'play'; document.body.classList.add('playing');
   requestLock(); canvas.focus();
   banner('WELCOME TO THE VILLAGE', `${npcs.length} characters to find`, '#d1b25a');
-  setTimeout(() => { if (state === 'play') toast(isTouch ? 'Tap or press ● to tag a character' : 'Click to tag a character · H for help', '#d1b25a'); }, 2600);
+  if (isTouch) goFullscreen();
+  setTimeout(() => { if (state === 'play') toast(isTouch ? 'Left thumb: walk · Right: look · Tap a character to tag it' : 'Click to tag a character · H for help', '#d1b25a'); }, 2600);
 }
+function goFullscreen() {
+  const el = document.documentElement, req = el.requestFullscreen || el.webkitRequestFullscreen;
+  if (!document.fullscreenElement && req) { try { const p = req.call(el, { navigationUI: 'hide' }); if (p && p.then) p.then(() => { try { screen.orientation.lock('landscape').catch(() => {}); } catch (e) { /* not supported */ } }).catch(() => {}); } catch (e) { /* not supported */ } }
+}
+const fsBtn = $('#btnFull');
+if (fsBtn) { if (!isTouch || !(document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen)) fsBtn.hidden = true;
+  fsBtn.addEventListener('click', () => { if (document.fullscreenElement) document.exitFullscreen(); else goFullscreen(); }); }
+document.addEventListener('visibilitychange', () => { if (document.hidden) { keys.clear(); resetJoy(); look.id = null; } });
 function pause() {
   state = 'paused'; keys.clear(); document.body.classList.remove('playing'); $('#crosshair').hidden = true;
   pauseEl.innerHTML = `<div class="screen-inner"><p class="eyebrow">PAUSED</p><h1 style="font-size:clamp(28px,5vw,48px)">${foundCount()}/${npcs.length} found</h1>
@@ -936,15 +996,30 @@ function showEnd() {
 /* =====================================================================
    LOOP
    ===================================================================== */
-addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
+function fitView() { camera.aspect = innerWidth / innerHeight; camera.fov = camera.aspect < 1 ? 88 : 72; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); }
+addEventListener('resize', fitView); addEventListener('orientationchange', () => setTimeout(fitView, 250)); fitView();
 const clock = new THREE.Clock();
+const perf = { t: 0, frames: 0, level: 0 };
+function adaptQuality(dt) {
+  if (state !== 'play' || perf.level >= 3) return;
+  perf.t += dt; perf.frames++;
+  if (perf.t < 3) return;
+  const fps = perf.frames / perf.t; perf.t = 0; perf.frames = 0;
+  if (fps > 40) { if (perf.level === 0) perf.level = 3; return; }   // fine: stop checking
+  perf.level++;
+  if (perf.level === 1) { renderer.setPixelRatio(Math.min(1, window.devicePixelRatio || 1)); }
+  if (perf.level === 2) { sun.castShadow = false; renderer.setPixelRatio(0.8); }
+  if (perf.level === 3) { renderer.setPixelRatio(0.65); camera.far = 260; camera.updateProjectionMatrix(); }
+  renderer.setSize(innerWidth, innerHeight);
+}
 let elapsed = 0;
 function frame() {
   const dt = Math.min(0.05, clock.getDelta()); elapsed += dt;
-  updateWeather(dt);
+  updateWeather(dt); adaptQuality(dt);
   if (state === 'play') {
     updatePlayer(dt); playTime += dt;
-    if (fireQueued) fire();
+    if (fireQueued) fire(); else if (tapAt) fire(tapAt);
+    tapAt = null;
     updateAim(dt); updateHint(dt);
   } else if (state === 'title' || state === 'loading') {
     const a = elapsed * 0.05;
