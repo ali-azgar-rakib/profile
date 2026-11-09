@@ -74,7 +74,7 @@ function groundH(x, z) {
   const d = Math.hypot(x, z);
   let h = rawH(x, z) * smooth(16, 42, d) + 0.25;
   h += smooth(118, 152, d) * 9;
-  const rd = Math.abs(z - riverZ(x)), r = 1 - smooth(RIVER_W * 0.45, RIVER_W + 1.5, rd);
+  const rd = Math.abs(z - riverZ(x)), r = 1 - smooth(RIVER_W * 0.6, RIVER_W + 0.9, rd);
   return lerp(h, -2.3, r);
 }
 const BRIDGE = (() => { const zc = riverZ(0); const y = Math.max(groundH(0, zc - 11), groundH(0, zc + 11), 0) + 0.35; return { x0: -1.8, x1: 1.8, z0: zc - 11, z1: zc + 11, y }; })();
@@ -162,10 +162,10 @@ function box(w, h, d, color, x, y, z, parent, extra) {
 const blockers = [];            // meshes that stop tag darts
 const PAL = {
   grass: [0.495, 0.55, 0.26], grassDark: [0.535, 0.55, 0.18], path: 0x9c5f42, pathEdge: 0x6f6a5c,
-  sand: 0xc89a76, bed: 0x5f6b6c, hill: [0.55, 0.3, 0.36],
+  sand: 0xbf6a3c, bed: 0x2f5f8a, clay: 0x9a4a2a, hill: [0.55, 0.3, 0.36],
   pine: [0.465, 0.5, 0.16], trunk: 0x7a4632, rock: [0.04, 0.42, 0.6], moss: [0.48, 0.42, 0.36],
   flowers: [0xff7fc6, 0xe25cb6, 0xc770e6, 0xff9fd8, 0xf2a6ff], fern: 0x235c6c, bush: 0x2b6b74,
-  water: 0x2794b0, mountain: 0x8db7dc, snow: 0xe6f1fa
+  water: 0x2f7fe0, mountain: 0x8db7dc, snow: 0xe6f1fa
 };
 function buildTerrain() {
   const seg = isTouch ? 110 : 150;
@@ -175,7 +175,9 @@ function buildTerrain() {
     const x = p.getX(i), z = p.getZ(i), h = groundH(x, z); p.setY(i, h);
     const v = (Math.sin(x * 0.31) * Math.cos(z * 0.27) + Math.sin(x * 0.07 + z * 0.11)) * 0.5;
     const patch = Math.sin(x * 0.045 + 1.3) * Math.cos(z * 0.05) * 0.5 + 0.5;
-    if (h < WATER_Y + 0.45) c.setHex(h < WATER_Y - 0.4 ? PAL.bed : PAL.sand);
+    const nearRiver = Math.abs(z - riverZ(x)) < RIVER_W + 1.6;
+    if (h < WATER_Y - 0.4) c.setHex(PAL.bed);
+    else if (nearRiver && h < 0.9) c.setHex(h < 0.0 ? PAL.clay : PAL.sand);
     else {
       c.setHSL(PAL.grass[0] + v * 0.02, PAL.grass[1] + v * 0.04, PAL.grass[2] + v * 0.05);
       c2.setHSL(PAL.grassDark[0], PAL.grassDark[1], PAL.grassDark[2]); c.lerp(c2, patch * 0.45);
@@ -204,7 +206,7 @@ function buildWater() {
   }
   waterTex = new THREE.DataTexture(data, N, N); waterTex.wrapS = waterTex.wrapT = THREE.RepeatWrapping; waterTex.repeat.set(50, 50); waterTex.needsUpdate = true;
   const water = new THREE.Mesh(new THREE.PlaneGeometry(SIZE, SIZE), new THREE.MeshStandardMaterial({
-    color: PAL.water, roughness: 0.12, metalness: 0.1, transparent: true, opacity: 0.82, normalMap: waterTex, normalScale: new THREE.Vector2(0.5, 0.5) }));
+    color: PAL.water, emissive: 0x0b2f6a, emissiveIntensity: 0.35, roughness: 0.08, metalness: 0.1, transparent: true, opacity: 0.9, normalMap: waterTex, normalScale: new THREE.Vector2(0.5, 0.5) }));
   water.rotation.x = -Math.PI / 2; water.position.y = WATER_Y; water.receiveShadow = true; scene.add(water);
 }
 
@@ -218,68 +220,204 @@ function buildBridge() {
   scene.add(g); g.traverse(m => { if (m.isMesh) blockers.push(m); });
 }
 
-/* =====================================================================
-   VILLAGE: CABINS, LAMPS, FENCES
-   ===================================================================== */
-const houses = [], circles = [];
-const winMat = new THREE.MeshStandardMaterial({ color: 0x2b4a56, emissive: 0xffc46b, emissiveIntensity: 0, roughness: 0.4 });
-const lampMat = new THREE.MeshStandardMaterial({ color: 0xffe2a6, emissive: 0xffc46b, emissiveIntensity: 0.4 });
-function makeHouse(x, z, rot, w, d, wall, roof) {
-  const g = new THREE.Group(), h = 3.4;
-  g.position.set(x, groundH(x, z) - 0.2, z); g.rotation.y = rot;
-  box(w + 0.3, 0.5, d + 0.3, 0xa58f84, 0, 0.25, 0, g);                         // stone base
-  box(w, h, d, wall, 0, 0.5 + h / 2, 0, g);
-  for (let k = 0.85; k < h; k += 0.85) box(w + 0.04, 0.06, d + 0.04, 0x6a3e2a, 0, 0.5 + k, 0, g);   // log seams
-  [-1, 1].forEach(s => { box(0.26, h, 0.26, 0x6a3e2a, s * (w / 2), 0.5 + h / 2, d / 2, g); box(0.26, h, 0.26, 0x6a3e2a, s * (w / 2), 0.5 + h / 2, -d / 2, g); });
-  const roofM = new THREE.Mesh(new THREE.ConeGeometry(1, 2.6, 4).rotateY(Math.PI / 4), mat(roof));
-  roofM.scale.set((w + 0.9) / Math.SQRT2, 1, (d + 0.9) / Math.SQRT2); roofM.position.y = 0.5 + h + 1.3; roofM.castShadow = true; g.add(roofM);
-  box(0.6, 1.6, 0.6, 0xa58f84, w * 0.25, 0.5 + h + 1.8, -d * 0.15, g);         // chimney
-  box(1.1, 2.0, 0.12, 0x5a3424, 0, 1.5, d / 2 + 0.02, g);                       // door
-  box(0.12, 0.12, 0.06, 0xd1b25a, 0.35, 1.5, d / 2 + 0.1, g);
-  box(1.6, 0.12, 0.7, roof, 0, 2.7, d / 2 + 0.35, g);                           // awning
-  [[-w * 0.3, d / 2 + 0.02, 0], [w * 0.3, d / 2 + 0.02, 0], [w / 2 + 0.02, 0, Math.PI / 2], [-w / 2 - 0.02, 0, Math.PI / 2]].forEach(([wx, wz, r], i) => {
-    const wg = new THREE.Group(); wg.position.set(wx, 2.3, i < 2 ? wz : 0); wg.rotation.y = r; g.add(wg);
-    if (i < 2 && Math.abs(wx) < 0.9) return;
-    box(0.9, 0.9, 0.08, winMat, 0, 0, 0, wg); box(1.05, 0.12, 0.14, 0xf0e2c8, 0, -0.5, 0.02, wg); box(0.08, 0.9, 0.1, 0xf0e2c8, 0, 0, 0.02, wg);
-  });
-  scene.add(g); g.traverse(m => { if (m.isMesh) blockers.push(m); });
-  houses.push({ x, z, rot, hw: w / 2 + 0.35, hd: d / 2 + 0.35 });
-}
-function buildVillage() {
-  const walls = [0xb07a52, 0xc68d62, 0xe8d6bc, 0xa96f4a, 0xdcc3a2], roofs = [0x2f6f73, 0x3e5f8a, 0xa0523d, 0x2a5a66];
-  const angles = [0.25, 1.05, 2.05, 2.75, 3.55, 4.35, 5.15, 5.85];
-  angles.forEach((a, i) => {
-    const r = 20 + (i % 3) * 3.5, x = Math.cos(a) * r, z = Math.sin(a) * r;
-    if (z > 0 && Math.abs(x) < 7) return;
-    if (pathDist(x, z) < 4.5) return;
-    makeHouse(x, z, Math.atan2(-x, -z), 5.2 + (i % 2) * 1.2, 4.6 + (i % 3) * 0.6, walls[i % walls.length], roofs[i % roofs.length]);
-  });
-  const wg = new THREE.Group(); wg.position.set(-7, groundH(-7, 4), 4);
-  const ring = new THREE.Mesh(new THREE.CylinderGeometry(1.1, 1.2, 0.9, 10, 1, true), mat(0xb39a8e, { side: THREE.DoubleSide })); ring.position.y = 0.45; ring.castShadow = true; wg.add(ring);
-  box(0.12, 1.8, 0.12, 0x6a3e2a, -0.95, 1.3, 0, wg); box(0.12, 1.8, 0.12, 0x6a3e2a, 0.95, 1.3, 0, wg);
-  const wr = new THREE.Mesh(new THREE.ConeGeometry(1.5, 0.9, 4).rotateY(Math.PI / 4), mat(0x2f6f73)); wr.position.y = 2.6; wr.castShadow = true; wg.add(wr);
-  scene.add(wg); circles.push({ x: -7, z: 4, r: 1.4 }); wg.traverse(m => { if (m.isMesh) blockers.push(m); });
-  for (let i = 0; i < 7; i++) {
-    const a = i / 7 * Math.PI * 2 + 0.2, x = Math.cos(a) * 13.5, z = Math.sin(a) * 13.5;
-    const lg = new THREE.Group(); lg.position.set(x, groundH(x, z), z);
-    box(0.16, 3.2, 0.16, 0x3a2a26, 0, 1.6, 0, lg);
-    const lamp = new THREE.Mesh(new THREE.SphereGeometry(0.28, 8, 6), lampMat); lamp.position.y = 3.35; lg.add(lamp);
-    box(0.5, 0.08, 0.5, 0x3a2a26, 0, 3.62, 0, lg);
-    scene.add(lg); circles.push({ x, z, r: 0.3 });
-  }
-  for (let i = -6; i <= 6; i++) { const x = -30 + i * 1.6, z = -26 + Math.sin(i) * 0.3; box(0.12, 1, 0.12, 0x8a5236, x, groundH(x, z) + 0.5, z); if (i < 6) box(1.6, 0.1, 0.06, 0x8a5236, x + 0.8, groundH(x, z) + 0.75, z); }
-}
-
-/* =====================================================================
-   NATURE: PINES, BOULDERS, FERNS, GRASS, FLOWERS, STUMPS, MUSHROOMS
-   ===================================================================== */
-const landOK = (x, z, margin = 0) => {
+function landOK(x, z, margin = 0) {
   if (Math.hypot(x, z) > 146) return false;
   if (Math.abs(z - riverZ(x)) < RIVER_W + 2 + margin) return false;
   if (groundH(x, z) < WATER_Y + 0.4) return false;
   for (const h of houses) if (Math.hypot(x - h.x, z - h.z) < Math.max(h.hw, h.hd) + 1.5 + margin) return false;
   return true;
 };
+
+/* =====================================================================
+   VILLAGE: COTTAGES, WINDMILL, MARKET STALL, LANTERNS, FENCES
+   ===================================================================== */
+const houses = [], circles = [];
+const winMat = new THREE.MeshStandardMaterial({ color: 0x2b4a56, emissive: 0xffc46b, emissiveIntensity: 0, roughness: 0.4 });
+const lampMat = new THREE.MeshStandardMaterial({ color: 0xffe2a6, emissive: 0xffc46b, emissiveIntensity: 0.6 });
+function canvasTex(w, h, draw) { const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 4; return t; }
+const plankTex = canvasTex(128, 128, (g, w, h) => {
+  const rr = rng(77);
+  for (let x = 0; x < w; x += 16) { const k = rr(); g.fillStyle = `hsl(${22 + k * 6},${55 + k * 10}%,${42 + k * 8}%)`; g.fillRect(x, 0, 16, h); g.fillStyle = 'rgba(255,220,170,.18)'; g.fillRect(x + 2, 0, 2, h); g.fillStyle = 'rgba(60,25,10,.55)'; g.fillRect(x + 15, 0, 1.5, h); }
+  for (let i = 0; i < 6; i++) { g.fillStyle = 'rgba(60,25,10,.3)'; g.fillRect(Math.floor(rr() * 8) * 16, rr() * h, 16, 1.5); }
+});
+const shingleTex = canvasTex(128, 128, (g, w, h) => {
+  const rr = rng(91);
+  for (let row = 0; row < 8; row++) {
+    const y = row * 16, off = row % 2 ? 12 : 0;
+    for (let x = -off; x < w; x += 24) { const k = rr(); g.fillStyle = `hsl(${16 + k * 8},${52 + k * 12}%,${38 + k * 10}%)`; g.fillRect(x + 1, y, 22, 15); g.fillStyle = 'rgba(255,210,160,.22)'; g.fillRect(x + 1, y, 22, 3); }
+    g.fillStyle = 'rgba(50,20,8,.6)'; g.fillRect(0, y + 14, w, 2);
+  }
+});
+const wallMats = [0xffffff, 0xffe2c4, 0xf0c09a].map(c => new THREE.MeshStandardMaterial({ map: plankTex, color: c, roughness: 0.9 }));
+const roofMats = [0xffffff, 0xe9b08a, 0xffd2b0].map(c => new THREE.MeshStandardMaterial({ map: shingleTex, color: c, roughness: 0.85 }));
+const trim = 0x7a3c1e, cream = 0xf3e2c4;
+function addTo(list, m) { list.push(m); return m; }
+
+function stripes(parent, x, y, z, width, depth, tilt, n, cols) {
+  const sw = width / n;
+  for (let i = 0; i < n; i++) { const s = box(sw, 0.06, depth, cols[i % cols.length], x - width / 2 + sw * (i + 0.5), y, z, parent); s.rotation.x = tilt; }
+  for (let i = 0; i < n; i++) { const v = box(sw, 0.22, 0.04, cols[i % cols.length], x - width / 2 + sw * (i + 0.5), y - Math.sin(tilt) * depth / 2 - 0.12, z + Math.cos(tilt) * depth / 2, parent); v.castShadow = false; }
+}
+function makeHouse(x, z, rot, w, d, variant) {
+  const g = new THREE.Group(), h = 3.0, wallTop = 0.6 + h, o = 0.45, a = 0.92, Hr = (w / 2) * Math.tan(a);
+  g.position.set(x, groundH(x, z) - 0.2, z); g.rotation.y = rot;
+  box(w + 0.5, 0.6, d + 0.5, 0x9b6a4a, 0, 0.3, 0, g);                                   // raised base
+  const walls = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), wallMats[variant % 3]); walls.position.y = 0.6 + h / 2; walls.castShadow = walls.receiveShadow = true; g.add(walls);
+  [-1, 1].forEach(sx => [-1, 1].forEach(sz => box(0.3, h + 0.1, 0.3, trim, sx * w / 2, 0.6 + h / 2, sz * d / 2, g)));
+  box(w + 0.1, 0.22, d + 0.1, trim, 0, wallTop - 0.05, 0, g);                         // top beam
+  // gable ends (front + back) with plank fill
+  const tri = new THREE.Shape(); tri.moveTo(-w / 2, 0); tri.lineTo(w / 2, 0); tri.lineTo(0, Hr); tri.closePath();
+  const triG = new THREE.ExtrudeGeometry(tri, { depth: 0.12, bevelEnabled: false });
+  [d / 2 - 0.12, -d / 2].forEach(zz => { const m = new THREE.Mesh(triG, wallMats[variant % 3]); m.position.set(0, wallTop, zz); m.castShadow = true; g.add(m); });
+  // steep shingled roof: four stepped slabs per side
+  const s = w / 2 + o, L = s / Math.cos(a), yE = wallTop - o * Math.tan(a), rows = 4;
+  [-1, 1].forEach(sgn => {
+    for (let k = 0; k < rows; k++) {
+      const t = (k + 0.5) * L / rows, n = (rows - k) * 0.05;
+      const m = new THREE.Mesh(new THREE.BoxGeometry(L / rows * 1.25, 0.2, d + 2 * o), roofMats[variant % 3]);
+      m.position.set(sgn * (s - t * Math.cos(a)) + sgn * Math.sin(a) * n, yE + t * Math.sin(a) + Math.cos(a) * n, 0); m.rotation.z = -sgn * a;
+      m.castShadow = m.receiveShadow = true; g.add(m);
+    }
+  });
+  box(0.36, 0.3, d + 2 * o + 0.1, 0x6a2f16, 0, wallTop + Hr + 0.12, 0, g);              // ridge cap
+  // chimney
+  box(0.7, 2.2, 0.7, 0xa8583a, w * 0.25, wallTop + Hr * 0.55, -d * 0.2, g); box(0.9, 0.2, 0.9, 0x6a2f16, w * 0.25, wallTop + Hr * 0.55 + 1.15, -d * 0.2, g);
+  // arched door + frame + porch steps
+  const fz = d / 2;
+  box(1.4, 1.95, 0.08, cream, 0, 0.6 + 0.95, fz + 0.02, g);
+  const arch = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.7, 0.08, 14).rotateX(Math.PI / 2), mat(cream)); arch.position.set(0, 0.6 + 1.9, fz + 0.02); g.add(arch);
+  box(1.12, 1.8, 0.1, 0x6e3418, 0, 0.6 + 0.9, fz + 0.06, g);
+  const archD = new THREE.Mesh(new THREE.CylinderGeometry(0.56, 0.56, 0.1, 14).rotateX(Math.PI / 2), mat(0x6e3418)); archD.position.set(0, 0.6 + 1.8, fz + 0.06); g.add(archD);
+  box(0.1, 0.1, 0.06, 0xd1b25a, 0.36, 1.5, fz + 0.13, g);
+  box(1.9, 0.22, 0.6, 0x9b6a4a, 0, 0.42, fz + 0.5, g); box(1.6, 0.22, 0.45, 0x9b6a4a, 0, 0.2, fz + 0.95, g);
+  // round window in the gable
+  const rw = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.42, 0.1, 16).rotateX(Math.PI / 2), mat(cream)); rw.position.set(0, wallTop + Hr * 0.42, fz + 0.04); g.add(rw);
+  const rwg = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.32, 0.12, 16).rotateX(Math.PI / 2), winMat); rwg.position.set(0, wallTop + Hr * 0.42, fz + 0.05); g.add(rwg);
+  // shuttered windows with flower boxes (front) + plain windows (sides)
+  const shutter = [0x4f8a5a, 0x3d6f9a, 0xb5452f][variant % 3];
+  [-1, 1].forEach(sx => {
+    const wx = sx * w * 0.3;
+    box(0.95, 0.95, 0.08, cream, wx, 2.3, fz + 0.03, g); box(0.75, 0.75, 0.1, winMat, wx, 2.3, fz + 0.05, g);
+    box(0.06, 0.75, 0.12, cream, wx, 2.3, fz + 0.07, g); box(0.75, 0.06, 0.12, cream, wx, 2.3, fz + 0.07, g);
+    box(0.32, 0.95, 0.06, shutter, wx - 0.66, 2.3, fz + 0.06, g); box(0.32, 0.95, 0.06, shutter, wx + 0.66, 2.3, fz + 0.06, g);
+    box(1.0, 0.24, 0.3, 0x7a3c1e, wx, 1.7, fz + 0.2, g);
+    for (let f = 0; f < 4; f++) { const fl = new THREE.Mesh(new THREE.IcosahedronGeometry(0.1, 0), mat([0xff6f91, 0xffd25a, 0xf2f2f2, 0xd94f7a][(f + variant) % 4])); fl.position.set(wx - 0.36 + f * 0.24, 1.9, fz + 0.24); g.add(fl); }
+    const sideG = new THREE.Group(); sideG.position.set(sx * (w / 2 + 0.03), 2.3, 0); sideG.rotation.y = sx * Math.PI / 2; g.add(sideG);
+    box(0.95, 0.95, 0.06, cream, 0, 0, 0, sideG); box(0.75, 0.75, 0.08, winMat, 0, 0, 0.02, sideG);
+  });
+  // striped awning over one window (shop-like)
+  if (variant % 2 === 0) stripes(g, w * 0.3, 3.0, fz + 0.5, 1.6, 0.9, 0.45, 6, [0xd9473a, cream]);
+  else stripes(g, -w * 0.3, 3.0, fz + 0.5, 1.6, 0.9, 0.45, 6, [0x3d6f9a, cream]);
+  // little lantern by the door
+  box(0.06, 0.4, 0.3, 0x3a2a26, 0.95, 2.45, fz + 0.18, g); const ln = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.3, 0.22), lampMat); ln.position.set(0.95, 2.2, fz + 0.36); g.add(ln);
+  // props: barrels, crates
+  const barrel = new THREE.CylinderGeometry(0.34, 0.3, 0.8, 10);
+  [[-w / 2 - 0.5, d / 2 - 0.2], [-w / 2 - 0.55, d / 2 - 0.95]].forEach(([bx, bz]) => { const b = new THREE.Mesh(barrel, mat(0x8a4a24)); b.position.set(bx, 0.6 + 0.4 - 0.25, bz); b.castShadow = true; g.add(b); box(0.72, 0.06, 0.72, 0x3a2a26, bx, 0.6 + 0.62 - 0.25, bz, g).rotation.y = 0.3; });
+  box(0.7, 0.6, 0.7, 0xb07a44, w / 2 + 0.6, 0.35, d / 2 - 0.4, g).rotation.y = 0.2; box(0.55, 0.45, 0.55, 0xc68d52, w / 2 + 0.6, 0.85, d / 2 - 0.4, g).rotation.y = -0.3;
+  scene.add(g); g.traverse(m => { if (m.isMesh) blockers.push(m); });
+  houses.push({ x, z, rot, hw: w / 2 + 0.6, hd: d / 2 + 0.5 });
+}
+
+let windmillBlades = null;
+function makeWindmill(x, z) {
+  const g = new THREE.Group(); g.position.set(x, groundH(x, z) - 0.2, z); g.rotation.y = Math.atan2(-x, -z);
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(2.5, 2.7, 1.2, 12), mat(0xa8583a)); base.position.y = 0.6; base.castShadow = true; g.add(base);
+  const tower = new THREE.Mesh(new THREE.CylinderGeometry(1.7, 2.3, 6.5, 12), mat(0xf0c050)); tower.position.y = 1.2 + 3.25; tower.castShadow = tower.receiveShadow = true; g.add(tower);
+  const band = new THREE.Mesh(new THREE.CylinderGeometry(2.0, 2.0, 0.3, 12), mat(trim)); band.position.y = 4.4; g.add(band);
+  const cap = new THREE.Mesh(new THREE.ConeGeometry(2.3, 2.8, 12), roofMats[0]); cap.position.y = 7.7 + 1.4; cap.castShadow = true; g.add(cap);
+  const ring = new THREE.Mesh(new THREE.CylinderGeometry(2.25, 2.25, 0.35, 12), mat(0x6a2f16)); ring.position.y = 7.85; g.add(ring);
+  box(1.3, 2.0, 0.2, 0x6e3418, 0, 2.2, 2.25, g); const ar = new THREE.Mesh(new THREE.CylinderGeometry(0.65, 0.65, 0.2, 14).rotateX(Math.PI / 2), mat(0x6e3418)); ar.position.set(0, 3.2, 2.25); g.add(ar);
+  box(0.8, 0.8, 0.12, cream, 0, 5.6, 1.98, g); box(0.6, 0.6, 0.14, winMat, 0, 5.6, 2.0, g);
+  const hub = new THREE.Group(); hub.position.set(0, 7.4, 2.35); g.add(hub);
+  const hm = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.35, 0.6, 10).rotateX(Math.PI / 2), mat(0x6a2f16)); hub.add(hm);
+  for (let i = 0; i < 4; i++) {
+    const arm = new THREE.Group(); arm.rotation.z = i * Math.PI / 2; hub.add(arm);
+    box(0.22, 4.8, 0.14, 0x6a2f16, 0, 2.5, 0.3, arm);
+    box(1.4, 3.6, 0.08, 0xe9a27a, 0.8, 2.9, 0.3, arm);
+    box(1.5, 0.12, 0.12, trim, 0.8, 1.1, 0.34, arm); box(1.5, 0.12, 0.12, trim, 0.8, 4.7, 0.34, arm); box(0.12, 3.7, 0.12, trim, 1.52, 2.9, 0.34, arm);
+  }
+  windmillBlades = hub;
+  scene.add(g); g.traverse(m => { if (m.isMesh) blockers.push(m); });
+  circles.push({ x, z, r: 2.8 });
+}
+
+function makeStall(x, z, rot) {
+  const g = new THREE.Group(); g.position.set(x, groundH(x, z), z); g.rotation.y = rot;
+  box(3.2, 1.0, 1.2, 0x9b5a34, 0, 0.5, 0, g); box(3.4, 0.12, 1.4, 0xc68d52, 0, 1.06, 0, g);
+  [[-1.55, -0.6], [1.55, -0.6], [-1.55, 0.6], [1.55, 0.6]].forEach(([px, pz]) => box(0.14, pz < 0 ? 2.9 : 2.4, 0.14, 0x6a3a26, px, (pz < 0 ? 2.9 : 2.4) / 2, pz, g));
+  stripes(g, 0, 2.55, 0.05, 3.4, 1.8, 0.28, 8, [0xd9473a, cream, 0x3d8fd0, cream]);
+  const fruit = [0xff6f4a, 0xffc94a, 0x8ad05a, 0xd94f7a];
+  for (let i = 0; i < 12; i++) { const f = new THREE.Mesh(new THREE.IcosahedronGeometry(0.13, 0), mat(fruit[i % 4])); f.position.set(-1.3 + (i % 6) * 0.5, 1.22, -0.25 + Math.floor(i / 6) * 0.45); g.add(f); }
+  box(0.6, 0.45, 0.6, 0xb07a44, 2.1, 0.23, 0.3, g); box(0.6, 0.45, 0.6, 0xc68d52, 2.15, 0.68, 0.25, g).rotation.y = 0.4;
+  scene.add(g); g.traverse(m => { if (m.isMesh) blockers.push(m); });
+  circles.push({ x, z, r: 1.9 });
+}
+
+function makeLantern(x, z) {
+  const lg = new THREE.Group(); lg.position.set(x, groundH(x, z), z);
+  box(0.18, 3.0, 0.18, 0x6a3a26, 0, 1.5, 0, lg); box(0.6, 0.1, 0.1, 0x6a3a26, 0.22, 3.0, 0, lg);
+  box(0.42, 0.12, 0.42, 0x8a2f22, 0.45, 2.95, 0, lg);
+  const glow = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.4, 0.3), lampMat); glow.position.set(0.45, 2.65, 0); lg.add(glow);
+  box(0.4, 0.08, 0.4, 0x8a2f22, 0.45, 2.42, 0, lg);
+  scene.add(lg); circles.push({ x, z, r: 0.3 });
+}
+
+function makeFenceAlong(points) {
+  const parts = [];
+  for (let i = 0; i < points.length; i++) {
+    const [x, z] = points[i], y = groundH(x, z);
+    parts.push(new THREE.BoxGeometry(0.16, 1.1, 0.16).translate(x, y + 0.5, z));
+    if (i < points.length - 1) {
+      const [x2, z2] = points[i + 1], y2 = groundH(x2, z2), len = Math.hypot(x2 - x, z2 - z), ang = Math.atan2(z2 - z, x2 - x);
+      [0.45, 0.85].forEach(hh => parts.push(new THREE.BoxGeometry(len, 0.1, 0.08).rotateY(-ang).translate((x + x2) / 2, (y + y2) / 2 + hh, (z + z2) / 2)));
+    }
+    circles.push({ x, z, r: 0.18 });
+  }
+  const m = new THREE.Mesh(mergeGeo(parts), mat(0x8a5236)); m.castShadow = true; scene.add(m); blockers.push(m);
+}
+
+function buildVillage() {
+  const angles = [0.25, 1.05, 2.05, 2.75, 3.55, 4.35, 5.15, 5.85];
+  angles.forEach((a, i) => {
+    const r = 21 + (i % 3) * 3.5, x = Math.cos(a) * r, z = Math.sin(a) * r;
+    if (z > 0 && Math.abs(x) < 8) return;
+    if (pathDist(x, z) < 5) return;
+    makeHouse(x, z, Math.atan2(-x, -z), 5.4 + (i % 2) * 1.0, 5.0 + (i % 3) * 0.5, i);
+  });
+  // windmill on the first free spot near the village edge
+  const wmSpots = [[-30, -14], [30, -12], [-32, 16], [28, 22], [-14, -32], [14, -34]];
+  for (const [x, z] of wmSpots) if (landOK(x, z, 2) && pathDist(x, z) > 6 && !houses.some(h => Math.hypot(h.x - x, h.z - z) < 9)) { makeWindmill(x, z); break; }
+  // well in the square
+  const wg = new THREE.Group(); wg.position.set(-7, groundH(-7, 4), 4);
+  const ring = new THREE.Mesh(new THREE.CylinderGeometry(1.1, 1.2, 0.9, 12, 1, true), mat(0xb39a8e, { side: THREE.DoubleSide })); ring.position.y = 0.45; ring.castShadow = true; wg.add(ring);
+  box(0.14, 1.9, 0.14, 0x6a3a26, -0.95, 1.3, 0, wg); box(0.14, 1.9, 0.14, 0x6a3a26, 0.95, 1.3, 0, wg);
+  const wr = new THREE.Mesh(new THREE.ConeGeometry(1.6, 1.1, 4).rotateY(Math.PI / 4), roofMats[1]); wr.position.y = 2.75; wr.castShadow = true; wg.add(wr);
+  scene.add(wg); circles.push({ x: -7, z: 4, r: 1.4 }); wg.traverse(m => { if (m.isMesh) blockers.push(m); });
+  for (let i = 0; i < 7; i++) { const a = i / 7 * Math.PI * 2 + 0.2; makeLantern(Math.cos(a) * 13.5, Math.sin(a) * 13.5); }
+  // market stall by the river, next to the trail to the bridge
+  const zs = riverZ(-9) - RIVER_W - 5;
+  makeStall(-9, zs, Math.PI / 2 + 0.2);
+  // rustic fences along the village side of the river, either side of the bridge
+  [[-26, -4], [4, 26]].forEach(([x0, x1]) => { const pts = []; for (let x = x0; x <= x1; x += 2.2) pts.push([x, riverZ(x) - RIVER_W - 2.2]); makeFenceAlong(pts); });
+  for (let i = -6; i <= 6; i++) { const x = -30 + i * 1.6, z = -26 + Math.sin(i) * 0.3; if (landOK(x, z)) { box(0.12, 1, 0.12, 0x8a5236, x, groundH(x, z) + 0.5, z); if (i < 6) box(1.6, 0.1, 0.06, 0x8a5236, x + 0.8, groundH(x, z) + 0.75, z); } }
+}
+
+/* sparkling river surface */
+const SPARK_N = isTouch ? 380 : 800;
+const sparkGeoA = new THREE.BufferGeometry(), sparkGeoB = new THREE.BufferGeometry();
+const sparkMatA = new THREE.PointsMaterial({ color: 0xe6f6ff, size: 0.16, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending, depthWrite: false });
+const sparkMatB = sparkMatA.clone();
+function buildSparkles() {
+  [sparkGeoA, sparkGeoB].forEach((geo, k) => {
+    const arr = new Float32Array(SPARK_N * 3);
+    for (let i = 0; i < SPARK_N; i++) { const x = (R() * 2 - 1) * 150; arr.set([x, WATER_Y + 0.03, riverZ(x) + (R() * 2 - 1) * RIVER_W * 0.85], i * 3); }
+    geo.setAttribute('position', new THREE.BufferAttribute(arr, 3));
+    const p = new THREE.Points(geo, k ? sparkMatB : sparkMatA); p.frustumCulled = false; scene.add(p);
+  });
+}
+/* =====================================================================
+   NATURE: PINES, BOULDERS, FERNS, GRASS, FLOWERS, STUMPS, MUSHROOMS
+   ===================================================================== */
 // merge several (already transformed) geometries into one, so each kind of plant is a single draw call
 function mergeGeo(parts) {
   const gs = parts.map(g => (g.index ? g.toNonIndexed() : g));
@@ -1013,7 +1151,7 @@ function buildMinimapBase() {
   g.fillStyle = '#5aa8a2'; g.beginPath(); g.arc(80, 80, 20, 0, 7); g.fill();
   g.strokeStyle = '#b8754a'; g.lineWidth = 1.6; g.lineCap = 'round'; TRAILS.forEach(s => { const [a1, b1] = toMap(s[0], s[1]), [a2, b2] = toMap(s[2], s[3]); g.beginPath(); g.moveTo(a1, b1); g.lineTo(a2, b2); g.stroke(); });
   g.beginPath(); g.arc(80, 80, 11 * MS, 0, 7); g.stroke();
-  g.strokeStyle = '#2b9cb6'; g.lineWidth = RIVER_W * 2 * MS; g.lineCap = 'round'; g.beginPath();
+  g.strokeStyle = '#2f7fe0'; g.lineWidth = RIVER_W * 2 * MS; g.lineCap = 'round'; g.beginPath();
   for (let x = -150; x <= 150; x += 3) { const [px, py] = toMap(x, riverZ(x)); x === -150 ? g.moveTo(px, py) : g.lineTo(px, py); } g.stroke();
   g.fillStyle = '#9c7d55'; const [bx, by] = toMap(0, (BRIDGE.z0 + BRIDGE.z1) / 2); g.fillRect(bx - 1.5, by - (BRIDGE.z1 - BRIDGE.z0) * MS / 2, 3, (BRIDGE.z1 - BRIDGE.z0) * MS);
   g.fillStyle = '#1e5552'; circles.forEach(c => { if (c.r > 0.3 && c.r < 0.9) { const [px, py] = toMap(c.x, c.z); g.fillRect(px - 0.8, py - 0.8, 1.6, 1.6); } });
@@ -1221,6 +1359,8 @@ function frame() {
   updateRain(dt); if (dust.material.opacity > 0.01) updateDust(dt, elapsed);
   clouds.forEach(c => { c.position.x += c.userData.v * dt; if (c.position.x > 280) c.position.x = -280; });
   if (waterTex) waterTex.offset.set(elapsed * 0.01, elapsed * 0.006);
+  if (windmillBlades) windmillBlades.rotation.z -= dt * 0.6;
+  sparkMatA.opacity = (0.35 + 0.45 * Math.abs(Math.sin(elapsed * 2.1))) * (1 - weather.rain * 0.7); sparkMatB.opacity = (0.35 + 0.45 * Math.abs(Math.cos(elapsed * 1.7))) * (1 - weather.rain * 0.7);
   sky.position.copy(camera.position);
   sun.position.copy(player.pos).add(SUN_OFF); sun.target.position.copy(player.pos);
   if (state !== 'title' && state !== 'loading') drawMinimap(elapsed);
@@ -1238,7 +1378,7 @@ const fontsReady = document.fonts && document.fonts.load
   ? Promise.race([Promise.all([document.fonts.load('700 40px "Chakra Petch"'), document.fonts.ready]), new Promise(r => setTimeout(r, 1800))])
   : Promise.resolve();
 fontsReady.catch(() => {}).then(() => requestAnimationFrame(() => {
-  buildTerrain(); buildWater(); buildBridge(); buildVillage(); buildNature(); buildMountains(); buildShafts(); buildClouds(); buildNPCs(); buildMinimapBase();
+  buildTerrain(); buildWater(); buildBridge(); buildVillage(); buildSparkles(); buildNature(); buildMountains(); buildShafts(); buildClouds(); buildNPCs(); buildMinimapBase();
   const s = findSpot(0, -6); SPAWN.set(s[0], floorAt(s[0], s[1]), s[1]); player.pos.copy(SPAWN);
   if (/[?&]debug/.test(location.search)) window.__cv3d = { player, npcs, camera, weather };
   updateCounters(); updateWeather(0);
