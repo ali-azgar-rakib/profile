@@ -126,7 +126,32 @@ window.CV = {
        description: "...", tech: ["Unreal Engine", "C++"],
        image: "assets/my-game.png", video: "https://youtu.be/ID",
        links: [{ label: "Steam", url: "https://..." }] }                    */
-  projects: [],
+  projects: [
+    {
+      title: "PIXO",
+      year: "",
+      role: "Unreal Engine Developer · Team member",
+      genre: "Fast-paced open-world adventure",
+      description:
+        "An open-world adventure across lush forests, floating islands and untamed lands. " +
+        "Players jump, dash and fight hostile machines and mysterious creatures, using abilities " +
+        "such as the Time Bubble, which freezes time in a small area so enemies can be outplayed.",
+      highlights: [
+        "Set up the Gameplay Ability System (GAS) as the foundation for the game's abilities",
+        "Designed the core enemy AI",
+        "Planned the project structure for the team",
+        "Implemented player abilities on top of GAS"
+      ],
+      tech: ["Unreal Engine", "GAS", "AI", "Abilities"],
+      image: "https://i.ytimg.com/vi/0wEjbSYNUM8/maxresdefault.jpg",
+      video: "https://youtu.be/0wEjbSYNUM8",
+      links: [
+        { label: "Official website", url: "https://playpixo.gg/" },
+        { label: "Gameplay video", url: "https://youtu.be/CC9m13zQcw8" },
+        { label: "Download the demo", url: "https://playpixo.gg/PixoGame.zip" }
+      ]
+    }
+  ],
 
   /* ---------- EDUCATION (each becomes an academy tower in the game) ---------- */
   education: [

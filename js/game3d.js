@@ -799,7 +799,7 @@ function buildNPCs() {
   const spots = [[-15, -6], [15, -4], [-9, -17], [10, -18], [-18, 10], [18, 12]];
   CV.experience.forEach((job, i) => addNPC({ kind: 'job', job, species: 'human', look: PEOPLE[(i + 1) % PEOPLE.length], item: 'case', label: shortCo(job.company), accent: ACCENT.job,
     x: spots[i % spots.length][0], z: spots[i % spots.length][1], title: `A villager with a “${shortCo(job.company)}” case` }));
-  CV.projects.forEach((p, i) => addNPC({ kind: 'project', project: p, species: ['dog', 'cat', 'fox'][i % 3], item: 'crate', label: p.title, accent: ACCENT.project, x: -40 + i * 26, z: -50, title: `Carrying “${p.title}”` }));
+  CV.projects.forEach((p, i) => addNPC({ kind: 'project', project: p, species: 'human', look: PEOPLE[(i + 2) % PEOPLE.length], item: 'sign', label: p.title, accent: ACCENT.project, x: -6 + i * 12, z: -30 - i * 6, title: `A game developer showing “${p.title}”` }));
   CV.education.forEach((ed, i) => addNPC({ kind: 'edu', edu: ed, species: 'owl', item: 'book', label: ed.degree.split(' ')[0] || 'Diploma', accent: ACCENT.edu,
     x: -24 + i * 30, z: riverZ(-24 + i * 30) + 22, title: 'A wise owl with a book' }));
   CV.achievements.forEach((a, i) => addNPC({ kind: 'award', award: a, species: 'bear', item: 'sign', label: a.title, accent: ACCENT.award, x: 70 - i * 20, z: 70, title: `Carrying “${a.title}”` }));
@@ -1216,7 +1216,13 @@ function panelFor(n) {
   }
   if (n.kind === 'job') { const j = n.job; return `${intro}<h2 id="panelTitle">${esc(j.role)}</h2><p class="sub">${esc(j.company)}${j.location ? ' · ' + esc(j.location) : ''} · ${esc(j.period || '')}${j.duration ? ' · ' + esc(j.duration) : ''}</p>${bullets(j.points)}${tags(j.tech)}`; }
   if (n.kind === 'edu') { const e = n.edu; return `${intro}<h2 id="panelTitle">${esc(e.degree)}</h2><p class="sub">${esc(e.school)}${e.location ? ' · ' + esc(e.location) : ''} · ${esc(e.period || '')}</p>${bullets(e.details)}`; }
-  if (n.kind === 'project') { const p = n.project; return `${intro}<h2 id="panelTitle">${esc(p.title)}</h2>${p.genre ? `<p class="sub">${esc(p.genre)}</p>` : ''}<p>${esc(p.description || '')}</p>${tags(p.tech)}<div class="btnrow">${linkBtns(p.links)}</div>`; }
+  if (n.kind === 'project') {
+    const p = n.project, m = String(p.video || '').match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([\w-]{6,})/), vid = m ? m[1] : '';
+    const media = vid ? `<div class="media"><iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(vid)}?rel=0" title="${esc(p.title)} trailer" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen loading="lazy"></iframe></div>`
+      : p.image ? `<div class="media"><img src="${esc(safeUrl(p.image))}" alt="${esc(p.title)}"></div>` : '';
+    return `${media}${intro}<h2 id="panelTitle">${esc(p.title)}</h2><p class="sub">${esc([p.role, p.genre].filter(Boolean).join(' · '))}</p><p>${esc(p.description || '')}</p>
+      ${p.highlights && p.highlights.length ? `<h3>MY CONTRIBUTIONS</h3>${bullets(p.highlights)}` : ''}${tags(p.tech)}<div class="btnrow">${linkBtns(p.links)}</div>`;
+  }
   if (n.kind === 'award') { const a2 = n.award; return `${intro}<h2 id="panelTitle">${esc(a2.title)}</h2>${a2.detail ? `<p>${esc(a2.detail)}</p>` : ''}`; }
   return panelContact(intro);
 }

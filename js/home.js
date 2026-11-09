@@ -81,12 +81,20 @@ const experience = !CV.experience.length ? '' : section('experience', 'Career', 
     ${tags(j.tech)}
   </article>`).join('')}</div>`);
 
-const projects = !CV.projects.length ? '' : section('projects', 'Selected work', 'Projects', `<div class="projects">${CV.projects.map(p => `
-  <article class="proj">${p.image ? `<img src="${esc(safeUrl(p.image))}" alt="${esc(p.title)} screenshot" loading="lazy">` : ''}
-    <div class="pb"><p class="meta2">${esc([p.year, p.role, p.genre].filter(Boolean).join(' · '))}</p><h3>${esc(p.title)}</h3>
-    ${p.description ? `<p>${esc(p.description)}</p>` : ''}${tags(p.tech)}
-    ${(p.links || []).some(l => safeUrl(l.url)) || p.video ? `<div class="links">${(p.links || []).filter(l => safeUrl(l.url)).map(l => `<a href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener">${esc(l.label)} ↗</a>`).join('')}${p.video ? `<a href="${esc(/^https?:/.test(p.video) ? p.video : 'https://youtu.be/' + p.video)}" target="_blank" rel="noopener">Watch video ↗</a>` : ''}</div>` : ''}</div>
-  </article>`).join('')}</div>`);
+const ytId = v => { v = String(v || '').trim(); const m = v.match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([\w-]{6,})/); return m ? m[1] : v; };
+const projects = !CV.projects.length ? '' : section('projects', 'Selected work', 'Projects', `<div class="projects${CV.projects.length === 1 ? ' one' : ''}">${CV.projects.map((p, i) => {
+  const vid = p.video ? ytId(p.video) : '';
+  const media = vid
+    ? `<button type="button" class="pmedia" data-yt="${esc(vid)}" aria-label="Play the ${esc(p.title)} trailer"><img src="${esc(safeUrl(p.image) || `https://i.ytimg.com/vi/${vid}/hqdefault.jpg`)}" alt="${esc(p.title)} trailer thumbnail" loading="lazy" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/${esc(vid)}/hqdefault.jpg'"><span class="pplay" aria-hidden="true"></span><span class="plabel">Watch trailer</span></button>`
+    : p.image ? `<div class="pmedia"><img src="${esc(safeUrl(p.image))}" alt="${esc(p.title)} screenshot" loading="lazy"></div>` : '';
+  return `<article class="proj${CV.projects.length === 1 || i === 0 ? ' feature' : ''}">${media}
+    <div class="pb"><p class="meta2">${esc([p.year, p.role].filter(Boolean).join(' · '))}</p><h3>${esc(p.title)}</h3>
+    ${p.genre ? `<p class="genre">${esc(p.genre)}</p>` : ''}
+    ${p.description ? `<p>${esc(p.description)}</p>` : ''}
+    ${p.highlights && p.highlights.length ? `<p class="contrib">My contributions</p><ul class="hl">${p.highlights.map(h => `<li>${esc(h)}</li>`).join('')}</ul>` : ''}
+    ${tags(p.tech)}
+    ${(p.links || []).some(l => safeUrl(l.url)) ? `<div class="links">${(p.links || []).filter(l => safeUrl(l.url)).map((l, k) => `<a class="${k === 0 ? 'btn btn-primary btn-sm' : 'btn btn-sm'}" href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener">${esc(l.label)} ↗</a>`).join('')}</div>` : ''}</div>
+  </article>`; }).join('')}</div>`);
 
 const education = !CV.education.length ? '' : section('education', 'Study', 'Education', CV.education.map(e => `
   <article class="edu"><div><h3>${esc(e.degree)}</h3><p class="school">${esc(e.school)}${e.location ? ' · ' + esc(e.location) : ''}</p><span class="when">${esc(e.period || '')}</span>
@@ -137,6 +145,15 @@ document.addEventListener('click', e => {
   const done = () => { toast('Copied ' + v); b.textContent = 'Copied'; setTimeout(() => (b.textContent = 'Copy'), 1500); };
   const fallback = () => { const r = document.createRange(); r.selectNodeContents(b.parentElement.querySelector('strong')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); toast('Selected. Press Ctrl+C to copy'); };
   if (navigator.clipboard) navigator.clipboard.writeText(v).then(done, fallback); else fallback();
+});
+
+/* project trailers load only when clicked */
+document.addEventListener('click', e => {
+  const m = e.target.closest('.pmedia[data-yt]'); if (!m) return;
+  const f = document.createElement('iframe');
+  f.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(m.dataset.yt)}?autoplay=1&rel=0`;
+  f.title = 'Project trailer'; f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen'; f.allowFullscreen = true;
+  const box = document.createElement('div'); box.className = 'pmedia'; box.appendChild(f); m.replaceWith(box);
 });
 
 /* highlight the current section in the nav */
