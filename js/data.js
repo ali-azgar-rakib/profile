@@ -18,7 +18,7 @@ window.CV = {
   tagline: "Unreal Engine Developer building gameplay systems with C++ and Blueprint.",
   location: "Bashundhara R/A, Dhaka",
   email: "aliazgarrakib@gmail.com",
-  phone: "01628651490",
+  phone: "",       // left empty on purpose: no phone number on the public site
   avatar: "",       // e.g. "assets/me.jpg"
   resumePdf: "",    // e.g. "assets/Ali-Azgar-Rakib-CV.pdf"
 
