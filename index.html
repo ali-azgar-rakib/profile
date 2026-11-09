@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Playable CV — Game Developer</title>
+  <meta name="description" content="A playable résumé. Run through the levels to explore skills, work experience, projects, education and achievements.">
+  <meta name="theme-color" content="#0b0820">
+  <meta property="og:title" content="Playable CV — Game Developer">
+  <meta property="og:description" content="My résumé is a game. Press start.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' shape-rendering='crispEdges'%3E%3Crect width='8' height='8' fill='%230b0820'/%3E%3Crect x='2' y='1' width='4' height='3' fill='%23ffcf9e'/%3E%3Crect x='2' y='0' width='4' height='1' fill='%233b2468'/%3E%3Crect x='3' y='2' width='1' height='1' fill='%230b0820'/%3E%3Crect x='5' y='2' width='1' height='1' fill='%230b0820'/%3E%3Crect x='2' y='4' width='4' height='3' fill='%232de2e6'/%3E%3Crect x='1' y='2' width='1' height='2' fill='%23ff3cac'/%3E%3Crect x='6' y='2' width='1' height='2' fill='%23ff3cac'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <canvas id="game" tabindex="0" aria-label="Playable résumé — use the arrow keys to explore"></canvas>
+  <div id="crt" aria-hidden="true"></div>
+
+  <header id="hud" hidden>
+    <div class="hud-id"><b id="hudName"></b><span id="hudTitle"></span></div>
+    <nav id="map" aria-label="Fast travel between worlds"></nav>
+    <div class="hud-right">
+      <span class="ctr" id="ctrSkills" title="Skill crystals collected"></span>
+      <span class="ctr" id="ctrFound" title="Entries discovered"></span>
+      <span class="ctr" id="ctrBugs" title="Bugs squashed"></span>
+      <button class="hbtn" id="btnCV" title="Open the classic one-page CV">CV</button>
+      <button class="hbtn" id="btnSound" title="Sound on/off (M)">♪</button>
+      <button class="hbtn" id="btnHelp" title="Controls (H)">?</button>
+    </div>
+  </header>
+
+  <div id="banner" aria-live="polite"></div>
+  <div id="toast" role="status" aria-live="polite"></div>
+
+  <div id="touch" aria-hidden="true">
+    <div class="pad"><button data-k="left">◀</button><button data-k="right">▶</button></div>
+    <div class="pad"><button data-k="act" class="act">E</button><button data-k="jump" class="jump">▲</button></div>
+  </div>
+
+  <div id="modal" hidden>
+    <div class="backdrop" data-close></div>
+    <article class="panel" role="dialog" aria-modal="true" aria-labelledby="panelTitle">
+      <button class="x" data-close aria-label="Close">✕</button>
+      <div id="panelBody"></div>
+      <p class="panel-hint">ESC TO CLOSE</p>
+    </article>
+  </div>
+
+  <section id="title" class="screen" aria-label="Start screen"></section>
+  <section id="end" class="screen" hidden aria-label="Level complete"></section>
+  <main id="cv" hidden></main>
+
+  <noscript>
+    <p style="color:#fff;font-family:sans-serif;padding:2rem;position:relative;z-index:99">
+      This playable CV needs JavaScript. Please enable it, or contact me directly.
+    </p>
+  </noscript>
+
+  <script src="js/data.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>
