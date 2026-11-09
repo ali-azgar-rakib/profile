@@ -1,8 +1,12 @@
-# Playable CV — a résumé you can play
+# Ali Azgar Rakib — Resume & Playable CV
 
-A static, no-build, browser-only website: a neon side-scrolling platformer where every
-world is a section of your CV. Recruiters in a hurry get a clean one-page **Quick CV**
-(printable / Save as PDF) with one click.
+Live: **https://ali-azgar-rakib.github.io/profile/**
+
+A static, no-build website with two pages that share one data file:
+
+- **`index.html`** — interactive resume homepage (synthwave theme, skill filters, quest-log timeline,
+  copy-to-clipboard contact). *Save as PDF* prints a clean white one-page-style resume.
+- **`play.html`** — the same resume as a neon side-scrolling platformer. Every world is a CV section.
 
 | World | Section | What's in the level |
 |---|---|---|
@@ -18,7 +22,7 @@ Bugs 🐞 patrol some levels — jump on them to "fix" them.
 
 ## 1. Edit your content
 
-Open **`js/data.js`** — that is the only file you need to change. The levels are generated
+Open **`js/data.js`** — that is the only file you need to change. Both the homepage and the game read it. The levels are generated
 from it, so adding a fourth job adds a fourth building, removing all achievements removes
 that world, etc.
 
@@ -26,7 +30,7 @@ that world, etc.
 - `video:` accepts a YouTube link or ID and shows the trailer inside the project panel.
 - Leave a field as `""` to hide it.
 
-Preview locally by just double-clicking `index.html`.
+Preview locally by double-clicking `index.html` (resume) or `play.html` (game).
 
 ## 2. Put it online (free)
 
@@ -43,9 +47,9 @@ Preview locally by just double-clicking `index.html`.
 - **itch.io** – zip the folder, create an "HTML" project and upload the zip (fits a game dev portfolio nicely).
 
 ## Handy links to share
-- `https://your-site/` — the game
-- `https://your-site/#cv` — opens straight to the printable Quick CV (good for job applications)
-- `https://your-site/#projects` — starts the game at a specific world (`#skills`, `#experience`, `#education`, `#achievements`, `#contact`)
+- `https://ali-azgar-rakib.github.io/profile/` — the resume homepage
+- `https://ali-azgar-rakib.github.io/profile/play.html` — the game
+- `https://ali-azgar-rakib.github.io/profile/play.html#projects` — starts the game at a world (`#skills`, `#experience`, `#education`, `#contact`)
 
 ## Controls
 `← →` / `A D` move · `Space` / `W` / `↑` jump (twice for double jump) · `↓ + Space` drop through platforms ·

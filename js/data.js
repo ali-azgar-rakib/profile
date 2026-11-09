@@ -1,215 +1,220 @@
 /* =====================================================================
-   YOUR CV DATA
+   CV DATA — Ali Azgar Rakib
    ---------------------------------------------------------------------
-   This is the only file you need to edit. The game world (levels,
-   buildings, arcade cabinets, trophies…) and the printable "Quick CV"
-   are generated from it automatically.
+   This one file powers BOTH the resume homepage (index.html) and the
+   game (play.html). Edit here and both update.
 
-   • Empty strings ("") hide a field. Empty lists [] hide a whole world.
-   • Images go in the /assets folder, e.g. image: "assets/neon-drift.png"
-   • video: a YouTube link or ID ("https://youtu.be/XXXX" or "XXXX")
-   • Skill level and stat values: skills 1–5, stats 1–10.
+   • Empty strings ("") hide a field. Empty lists [] hide a whole section.
+   • Images go in /assets, e.g. image: "assets/sports-game.png"
+   • video: a YouTube link or ID ("https://youtu.be/XXXX")
+   • Skill level 1–5, stat value 1–10 (self-assessment, tweak freely).
    ===================================================================== */
 
 window.CV = {
-  name: "Your Name",
-  title: "Game Developer",
-  tagline: "I build gameplay systems that feel great in the player's hands.",
-  location: "City, Country",
-  email: "you@example.com",
-  avatar: "",       // e.g. "assets/me.png" (square). "" shows your initials.
-  resumePdf: "",    // e.g. "assets/Your-Name-CV.pdf" adds a Download button.
+  name: "Ali Azgar Rakib",
+  title: "Game Programmer",
+  roles: ["Unreal Engine Developer", "Gameplay Programmer", "Multiplayer Systems", "AI & Animation"],
+  tagline: "Unreal Engine developer building gameplay, AI and multiplayer systems in C++ and Blueprint.",
+  location: "Bashundhara R/A, Dhaka, Bangladesh",
+  email: "aliazgarrakib@gmail.com",
+  phone: "01628651490",
+  avatar: "",       // e.g. "assets/me.jpg" (square). "" shows the pixel character / initials.
+  resumePdf: "",    // e.g. "assets/Ali-Azgar-Rakib-CV.pdf" adds a Download button.
 
   links: [
-    { label: "GitHub",   url: "https://github.com/your-username" },
-    { label: "itch.io",  url: "https://your-username.itch.io" },
-    { label: "LinkedIn", url: "https://www.linkedin.com/in/your-username" },
-    { label: "ArtStation", url: "" }
+    { label: "LinkedIn", url: "https://www.linkedin.com/in/rakib5" },
+    { label: "GitHub",   url: "https://github.com/ali-azgar-rakib" }
   ],
 
-  /* ---------- WORLD 1 · ABOUT ---------- */
+  /* ---------- ABOUT ---------- */
   about: {
-    level: 4,   // shown as "LVL 4" — e.g. years of experience
+    level: 4,          // shown as "LVL 4"
+    years: "3.5+",     // years of experience, shown in the stats strip
     summary:
-      "Game developer with 4+ years of experience shipping PC and mobile titles. " +
-      "I specialise in gameplay programming and game feel: responsive controls, " +
-      "readable AI and the small bits of juice that make a mechanic satisfying. " +
-      "Happiest working closely with designers and artists to find the fun fast.",
+      "Unreal Engine Developer with over 3.5 years of experience building gameplay systems " +
+      "using C++ and Blueprint. Skilled in AI, animation blueprints and multiplayer systems, " +
+      "with a strong focus on performance optimization.",
+    summary2:
+      "Previously worked as a game programmer, programming instructor and backend web developer, " +
+      "bringing strong problem-solving, teamwork and communication skills to every project. " +
+      "Passionate about creating high-quality, immersive gameplay experiences.",
     stats: [
       { label: "Gameplay Programming", value: 9 },
-      { label: "Systems & AI",         value: 8 },
-      { label: "Performance",          value: 7 },
-      { label: "Tools & Pipelines",    value: 7 },
-      { label: "Team Play",            value: 9 }
+      { label: "Multiplayer & Replication", value: 8 },
+      { label: "AI Systems", value: 8 },
+      { label: "Animation Blueprints", value: 7 },
+      { label: "Performance & Debugging", value: 8 }
     ],
     perks: [
-      "Shipped 3 commercial titles across PC, Steam Deck and mobile",
-      "Obsessed with game feel: input buffering, coyote time, screen shake",
-      "Game-jam regular — 12 jams and counting"
+      "Ships both dedicated-server and listen-server multiplayer games",
+      "Owns a full Unreal project solo, built on the Gameplay Ability System",
+      "Former programming instructor: explains complex systems clearly"
     ]
   },
 
-  /* ---------- WORLD 2 · SKILLS (each skill becomes a crystal) ---------- */
+  /* ---------- SKILLS (each skill becomes a crystal in the game) ---------- */
   skills: [
-    { category: "Engines", items: [
-      { name: "Unity", level: 5 },
-      { name: "Unreal Engine", level: 4 },
-      { name: "Godot", level: 3 }
+    { category: "Unreal Engine", items: [
+      { name: "C++", level: 5 },
+      { name: "Blueprint", level: 5 },
+      { name: "Gameplay Ability System", level: 4 },
+      { name: "Animation Blueprint Setup", level: 4 }
     ]},
-    { category: "Languages", items: [
-      { name: "C#", level: 5 },
-      { name: "C++", level: 4 },
-      { name: "HLSL / GLSL", level: 3 },
-      { name: "Python", level: 3 }
+    { category: "AI", items: [
+      { name: "Behaviour Tree", level: 5 },
+      { name: "StateTree", level: 4 }
     ]},
-    { category: "Game Systems", items: [
-      { name: "Gameplay & Controls", level: 5 },
-      { name: "AI & Pathfinding", level: 4 },
-      { name: "Physics", level: 3 },
-      { name: "Multiplayer / Netcode", level: 3 }
+    { category: "Multiplayer", items: [
+      { name: "Replication", level: 4 },
+      { name: "Dedicated Server", level: 4 },
+      { name: "Listen Server", level: 4 }
     ]},
-    { category: "Tools", items: [
-      { name: "Git & Perforce", level: 4 },
-      { name: "Blender", level: 3 },
-      { name: "FMOD", level: 3 }
+    { category: "Tools & Debugging", items: [
+      { name: "Performance Optimization", level: 4 },
+      { name: "Rewind Debugger", level: 4 },
+      { name: "Git", level: 4 },
+      { name: "SVN", level: 3 }
+    ]},
+    { category: "Also Speaks", items: [
+      { name: "C# / Python / C", level: 3 },
+      { name: "PHP (Laravel)", level: 3 }
     ]}
   ],
 
-  /* ---------- WORLD 3 · EXPERIENCE (each job becomes a building) ---------- */
+  /* ---------- EXPERIENCE (newest first; each job is a building in the game) ---------- */
   experience: [
     {
-      role: "Gameplay Programmer",
-      company: "Pixel Forge Studio",
-      period: "2024 — Present",
-      location: "Remote",
+      role: "Unreal Engine Developer",
+      company: "Future Studios Bangladesh",
+      period: "Sep 2025 — Present",
+      duration: "1 yr 3 mos",
+      location: "Full-time",
+      current: true,
       points: [
-        "Own the player controller, combat and camera systems for an unannounced action game",
-        "Built a data-driven ability system used by designers to ship 40+ abilities without code changes",
-        "Cut frame time by 30% on Steam Deck through profiling, pooling and job-system refactors"
+        "Develop dedicated-server and listen-server multiplayer games in Unreal Engine",
+        "Built gameplay and AI for a sports game using Behaviour Tree and StateTree",
+        "Own a complete project single-handedly, architected around the Gameplay Ability System (GAS)",
+        "Set up animation blueprints and replicated gameplay for networked play",
+        "Maintain and update the studio's existing Unreal projects"
       ],
-      tech: ["Unity", "C#", "DOTS", "Addressables"]
+      tech: ["Unreal Engine", "C++", "GAS", "Behaviour Tree", "StateTree", "Multiplayer", "Anim BP"]
     },
     {
-      role: "Junior Game Developer",
-      company: "Moonbyte Games",
-      period: "2022 — 2024",
-      location: "On-site",
+      role: "Game Programmer",
+      company: "BDGame Studio",
+      period: "Aug 2023 — May 2025",
+      duration: "1 yr 10 mos",
+      location: "Full-time",
       points: [
-        "Developed core loop and UI for a mobile tactics game with 1M+ downloads",
-        "Implemented live-ops events and remote config, raising D7 retention by 12%",
-        "Wrote editor tools that halved level-building time for the design team"
+        "Developed gameplay systems using C++ and Blueprint scripting within Unreal Engine",
+        "Implemented AI behaviors and animation blueprints to enhance gameplay experience",
+        "Worked on multiplayer features including replication and server-client architecture",
+        "Used Unreal Engine's Rewind Debugger for advanced debugging and issue resolution",
+        "Optimized game performance and debugged issues using Unreal Engine tools",
+        "Collaborated with designers to refine core mechanics and deliver polished gameplay"
       ],
-      tech: ["Unity", "C#", "Firebase", "DOTween"]
+      tech: ["Unreal Engine", "C++", "Blueprint", "AI", "Replication", "Rewind Debugger"]
     },
     {
-      role: "Game Programming Intern",
-      company: "Indie Collective",
-      period: "2021",
-      location: "Hybrid",
+      role: "Junior Instructor",
+      company: "Munshiganj Polytechnic Institute",
+      period: "Oct 2022 — May 2023",
+      duration: "8 mos",
+      location: "Teaching",
       points: [
-        "Prototyped three vertical slices in Unreal Engine with Blueprints and C++",
-        "Fixed 150+ bugs across gameplay, UI and save systems before launch"
+        "Taught programming courses and guided students on academic projects",
+        "Delivered lectures on C, Python, C# and web development (HTML, CSS, JavaScript, PHP)",
+        "Guided students through hands-on lab sessions and real-world programming tasks"
       ],
-      tech: ["Unreal Engine", "C++", "Blueprints"]
+      tech: ["C", "Python", "C#", "JavaScript", "PHP"]
+    },
+    {
+      role: "Web Developer",
+      company: "Paramorsho Consultancy",
+      period: "Jan 2021 — Dec 2021",
+      duration: "1 yr",
+      location: "Co-founder",
+      points: [
+        "Co-founded a startup offering paid video and audio consultations with doctors, lawyers, trainers, nutritionists and psychologists through a mobile app",
+        "Designed and built the web backend in PHP (Laravel) powering the mobile app's features"
+      ],
+      tech: ["PHP", "Laravel", "REST API", "MySQL"]
     }
   ],
 
-  /* ---------- WORLD 4 · PROJECTS (each becomes an arcade cabinet) ---------- */
+  /* ---------- PROJECTS (each becomes an arcade cabinet in the game) ----------
+     Add real titles, screenshots (image) and trailers (video) when you can. */
   projects: [
     {
-      title: "Neon Drift",
-      year: "2025",
-      role: "Lead Programmer",
-      genre: "Arcade racer · PC / Steam Deck",
+      title: "Multiplayer Sports Game",
+      year: "2025–26",
+      role: "Unreal Engine Developer",
+      company: "Future Studios Bangladesh",
+      genre: "Sports · Online multiplayer",
       description:
-        "A synthwave arcade racer built around drifting and boost chaining. " +
-        "I wrote the vehicle physics, ghost-replay system and the online leaderboards.",
-      highlights: [
-        "Custom arcade vehicle model tuned for controller and keyboard",
-        "Deterministic ghost replays at under 40 KB per lap"
-      ],
-      tech: ["Unity", "C#", "Steamworks", "FMOD"],
-      image: "",   // "assets/neon-drift.png"
-      video: "",   // "https://youtu.be/VIDEO_ID"
-      links: [
-        { label: "Play on itch.io", url: "https://your-username.itch.io/neon-drift" },
-        { label: "Source", url: "https://github.com/your-username/neon-drift" }
-      ]
+        "Networked sports game with AI-controlled players. Built team AI with Behaviour Tree " +
+        "and StateTree, replicated gameplay and animation blueprint setup for smooth online play.",
+      tech: ["Unreal Engine", "C++", "StateTree", "Behaviour Tree", "Replication"],
+      image: "", video: "", links: []
     },
     {
-      title: "Hollow Keep",
-      year: "2024",
-      role: "Solo Developer",
-      genre: "Roguelike dungeon crawler · PC",
+      title: "GAS Solo Project",
+      year: "2025–26",
+      role: "Sole Developer",
+      company: "Future Studios Bangladesh",
+      genre: "Unreal Engine · Gameplay Ability System",
       description:
-        "Procedurally generated dungeons, a synergy-driven item system and enemies " +
-        "with utility-based AI. Built in Unreal Engine with gameplay in C++.",
-      tech: ["Unreal Engine", "C++", "GAS", "Procedural Generation"],
-      image: "",
-      video: "",
-      links: [{ label: "Watch trailer", url: "https://youtube.com" }]
+        "A full project I manage on my own: abilities, attributes and effects driven by the " +
+        "Gameplay Ability System, with AI and animation integrated end to end.",
+      tech: ["Unreal Engine", "GAS", "C++", "Blueprint", "Anim BP"],
+      image: "", video: "", links: []
     },
     {
-      title: "Pocket Tactics",
-      year: "2023",
-      role: "Gameplay & UI Programmer",
-      genre: "Turn-based strategy · iOS / Android",
+      title: "Dedicated Server Game",
+      year: "2023–26",
+      role: "Gameplay / Network Programmer",
+      company: "Future Studios · BDGame Studio",
+      genre: "Online multiplayer · Dedicated & listen server",
       description:
-        "A bite-sized tactics game designed for one-thumb play. Shipped to 1M+ players " +
-        "with weekly live events.",
-      tech: ["Unity", "C#", "Firebase", "Mobile"],
-      image: "",
-      video: "",
-      links: [{ label: "Google Play", url: "https://play.google.com" }]
+        "Server-authoritative multiplayer gameplay: replication, RPCs and server-client " +
+        "architecture, debugged with the Rewind Debugger and optimized with Unreal's profiling tools.",
+      tech: ["Dedicated Server", "Listen Server", "C++", "Rewind Debugger", "Profiling"],
+      image: "", video: "", links: []
     },
     {
-      title: "Lost Signal",
-      year: "2025",
-      role: "Programmer · Game Jam",
-      genre: "Puzzle platformer · Web",
+      title: "Paramorsho App Backend",
+      year: "2021",
+      role: "Co-founder · Backend Developer",
+      company: "Paramorsho Consultancy",
+      genre: "Mobile app · Web backend",
       description:
-        "Made in 48 hours for Global Game Jam. Reroute a dying radio signal by " +
-        "rotating the world. Placed top 10 globally in the Innovation category.",
-      tech: ["Godot", "GDScript", "Game Jam"],
-      image: "",
-      video: "",
-      links: [{ label: "Play in browser", url: "https://your-username.itch.io/lost-signal" }]
+        "Backend for a consultation app connecting users with doctors, lawyers, trainers, " +
+        "nutritionists and psychologists over video and audio calls.",
+      tech: ["PHP", "Laravel", "REST API"],
+      image: "", video: "", links: []
     }
   ],
 
-  /* ---------- WORLD 5 · EDUCATION (each becomes an academy tower) ---------- */
+  /* ---------- EDUCATION (each becomes an academy tower in the game) ---------- */
   education: [
     {
-      degree: "B.Sc. in Computer Science & Engineering",
-      school: "Your University",
-      period: "2018 — 2022",
-      location: "City, Country",
-      details: [
-        "Thesis: Real-time procedural terrain generation on the GPU",
-        "Coursework: Computer Graphics, AI, Data Structures, Linear Algebra"
-      ]
-    },
-    {
-      degree: "Game Design & Development Specialization",
-      school: "Online Certificate",
-      period: "2021",
-      details: ["Level design, playtesting, game economy and player psychology"]
+      degree: "Diploma in Computer Engineering",
+      school: "Munshiganj Polytechnic Institute",
+      period: "2016 — 2020",
+      gpa: 3.5,
+      gpaMax: 4,
+      details: ["CGPA: 3.50 (out of 4.00)"]
     }
   ],
 
-  /* ---------- WORLD 6 · ACHIEVEMENTS (each becomes a trophy) ---------- */
-  achievements: [
-    { title: "Global Game Jam — Top 10", year: "2025", detail: "Lost Signal placed in the global top 10 for Innovation." },
-    { title: "1M+ Downloads", year: "2023", detail: "Pocket Tactics passed one million installs on mobile." },
-    { title: "Shipped 3 Titles", year: "2021—2025", detail: "From prototype to store launch on PC and mobile." },
-    { title: "Meetup Speaker", year: "2024", detail: "Talk: 'Game feel in 10 lines of code' at the local game dev meetup." }
-  ],
+  /* ---------- ACHIEVEMENTS (each becomes a trophy) — add yours here ---------- */
+  achievements: [],
 
-  /* ---------- WORLD 7 · CONTACT ---------- */
+  /* ---------- CONTACT ---------- */
   contact: {
-    heading: "Let's make something fun",
+    heading: "Ready Player Two?",
     message:
-      "I'm open to full-time gameplay programming roles and interesting collaborations. " +
-      "Send me a message and I'll get back to you within a couple of days."
+      "I'm open to Unreal Engine and gameplay programming roles, especially multiplayer, AI and " +
+      "systems work. Send me a message and I'll get back to you quickly."
   }
 };

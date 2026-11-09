@@ -7,7 +7,7 @@
   --accent: #2de2e6;
   --pink: #ff3cac;
   --pix: "Press Start 2P", ui-monospace, monospace;
-  --body: "Space Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --body: "Barlow", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
 * { box-sizing: border-box; }

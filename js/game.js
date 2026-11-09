@@ -875,7 +875,7 @@ const panels = {
     return `<div class="ph"><div class="avatar">${CV.avatar ? `<img src="${esc(safeUrl(CV.avatar))}" alt="${esc(CV.name)}">` : esc(initials(CV.name))}</div>
       <div><p class="kicker">PLAYER 1${a.level ? ' · LVL ' + esc(a.level) : ''}</p><h2 id="panelTitle">${esc(CV.name)}</h2>
       <p class="sub">${esc(CV.title)}${CV.location ? ' · ' + esc(CV.location) : ''}</p></div></div>
-      ${a.summary ? `<p>${esc(a.summary)}</p>` : ''}
+      ${a.summary ? `<p>${esc(a.summary)}</p>` : ''}${a.summary2 ? `<p>${esc(a.summary2)}</p>` : ''}
       ${a.stats && a.stats.length ? `<h3>BASE STATS</h3>${a.stats.map(s => `<div class="stat"><span>${esc(s.label)}</span><div class="bar"><i style="--v:${clamp(+s.value || 0, 0, 10) * 10}%"></i></div><b>${esc(s.value)}</b></div>`).join('')}` : ''}
       ${a.perks && a.perks.length ? `<h3>PERKS</h3>${bullets(a.perks)}` : ''}
       <div class="btnrow">${CV.email ? `<a class="btn" href="mailto:${esc(CV.email)}">✉ Email</a>` : ''}${linkBtns(CV.links, true)}</div>`;
@@ -920,8 +920,9 @@ const panels = {
     return `<p class="kicker">FINAL LEVEL</p><h2 id="panelTitle">${esc(c.heading || "Let's make something fun")}</h2>
       ${c.message ? `<p>${esc(c.message)}</p>` : ''}
       <div class="btnrow">${CV.email ? `<a class="btn" href="mailto:${esc(CV.email)}">✉ ${esc(CV.email)}</a>` : ''}
+      ${CV.phone ? `<a class="btn ghost" href="tel:${esc(String(CV.phone).replace(/[^+\d]/g, ''))}">☎ ${esc(CV.phone)}</a>` : ''}
       ${CV.resumePdf ? `<a class="btn ghost" href="${esc(safeUrl(CV.resumePdf))}" download>⬇ Download CV (PDF)</a>` : ''}
-      <button type="button" class="btn ghost" data-cv>📄 Quick CV</button></div>
+      <button type="button" class="btn ghost" data-cv>📄 Resume page</button></div>
       ${CV.links.some(l => safeUrl(l.url)) ? `<h3>FIND ME ONLINE</h3><div class="btnrow" style="margin-top:0">${linkBtns(CV.links, true)}</div>` : ''}`;
   },
   help() {
@@ -933,7 +934,7 @@ const panels = {
     return `<p class="kicker">HOW TO PLAY</p><h2 id="panelTitle">Controls</h2>
       <div class="controls-list">${rows.map(([k, v]) => `<kbd>${esc(k)}</kbd><span>${esc(v)}</span>`).join('')}</div>
       <p>Each world is a section of the CV. Stand at a terminal, door, arcade cabinet, tower or trophy and press E to read it. On a phone, use the on-screen buttons.</p>
-      <p>Short on time? <button type="button" class="linkbtn" data-cv>Open the classic one-page CV</button>.</p>`;
+      <p>Short on time? <button type="button" class="linkbtn" data-cv>Open the resume page</button>.</p>`;
   }
 };
 
@@ -991,9 +992,7 @@ function renderCV() {
   $('#cvPrint').addEventListener('click', () => window.print());
 }
 function openCV() {
-  renderCV(); cvEl.hidden = false; cvOpen = true; held.clear(); cvEl.scrollTop = 0;
-  try { history.replaceState(null, '', '#cv'); } catch (e) { /* file:// */ }
-  setTimeout(() => $('#cvBack').focus({ preventScroll: true }), 30);
+  location.href = 'index.html';
 }
 function closeCV() {
   cvEl.hidden = true; cvOpen = false;
@@ -1013,7 +1012,7 @@ function renderTitle() {
     ${CV.tagline ? `<p class="tagline">${esc(CV.tagline)}</p>` : '<p class="tagline"></p>'}
     <div class="btnrow">
       <button type="button" class="big" id="btnStart">▶ PRESS START</button>
-      <button type="button" class="ghostbig" id="btnQuick">📄 QUICK CV<br><small style="font-size:7px;color:var(--muted)">NO TIME TO PLAY? READ IT HERE</small></button>
+      <button type="button" class="ghostbig" id="btnQuick">📄 RESUME PAGE<br><small style="font-size:7px;color:var(--muted)">NO TIME TO PLAY? READ IT HERE</small></button>
     </div>
     <div class="keys">
       <span><kbd>←</kbd><kbd>→</kbd> move</span><span><kbd>SPACE</kbd> jump ×2</span><span><kbd>E</kbd> open</span><span><kbd>1</kbd>–<kbd>${world.zones.length}</kbd> fast travel</span>
@@ -1055,7 +1054,7 @@ function finish() {
     <p class="tagline" style="margin:0 auto 26px">${allDone ? 'You found everything. Now imagine what I could build for your team.' : 'Some secrets are still out there — or skip straight to saying hi.'}</p>
     <div class="btnrow">
       <button type="button" class="big" id="endContact">✉ CONTACT ME</button>
-      <button type="button" class="ghostbig" id="endCV">📄 QUICK CV</button>
+      <button type="button" class="ghostbig" id="endCV">📄 RESUME PAGE</button>
       <button type="button" class="ghostbig" id="endBack">↺ KEEP EXPLORING</button>
     </div></div>`;
   endEl.hidden = false;
@@ -1185,7 +1184,6 @@ function boot() {
   const h = location.hash.replace('#', '').toLowerCase();
   const zi = world.zones.findIndex(z => z.id === h || z.short.toLowerCase() === h);
   if (zi > 0) startZone = zi;
-  if (h === 'cv') openCV();
   requestAnimationFrame(t => { last = t; frame(t); });
 }
 
