@@ -74,11 +74,12 @@ window.CV = {
       location: "Full-time",
       current: true,
       points: [
-        "Worked on dedicated server and listen server multiplayer games",
-        "Worked on AI and on a sports game",
-        "Managed a single project on my own, using GAS (Gameplay Ability System)",
-        "Maintained and updated other existing projects as an Unreal Engine developer",
-        "Used Behaviour Tree, StateTree, Unreal Engine multiplayer, GAS and animation blueprint setup"
+        "Developed multiplayer games using both dedicated server and listen server architectures in Unreal Engine",
+        "Implemented AI behaviors using Behaviour Tree and StateTree",
+        "Built gameplay systems for a sports game",
+        "Independently managed and developed a complete project using the Gameplay Ability System (GAS)",
+        "Set up animation blueprints to drive character animation and gameplay",
+        "Maintained and updated existing studio projects as an Unreal Engine developer"
       ],
       tech: ["Behaviour Tree", "StateTree", "Unreal Engine Multiplayer", "GAS", "Animation Blueprint"]
     },
