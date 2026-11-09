@@ -386,7 +386,7 @@ function collect(it) {
   it.got = true; sfx.collect();
   burst(it.x + 11, it.y + 15, it.color, 16, 170, 0.7, 3, 220);
   const lvl = clamp(+it.skill.level || 0, 0, 5);
-  toast(`+ ${it.label.toUpperCase()}  ${'★'.repeat(lvl)}${'☆'.repeat(5 - lvl)}`, it.color);
+  toast(lvl ? `+ ${it.label.toUpperCase()}  ${'★'.repeat(lvl)}${'☆'.repeat(5 - lvl)}` : `+ SKILL: ${it.label.toUpperCase()}`, it.color);
   updateCounters();
   const got = world.items.filter(i => i.kind === 'crystal' && i.got).length;
   if (got === totals.skills) setTimeout(() => toast('ALL SKILLS COLLECTED!  ◆◆◆', '#ffd23f'), 1500);
@@ -885,7 +885,7 @@ const panels = {
     return `<p class="kicker">SKILL TREE</p><h2 id="panelTitle">Abilities</h2>
       <p class="sub">${got.length}/${totals.skills} crystals collected. Walk right to grab the rest ◆</p>
       <div class="skillgrid">${CV.skills.map((c, ci) => `<div class="skillcat" style="--c:${CAT_COLORS[ci % CAT_COLORS.length]}"><h4>${esc(c.category)}</h4>
-        ${(c.items || []).map(s => `<div class="skill${got.some(g => g.skill === s) ? ' got' : ''}"><span class="nm">${esc(s.name)}</span>${pips(clamp(+s.level || 0, 0, 5))}</div>`).join('')}</div>`).join('')}</div>`;
+        ${(c.items || []).map(s => `<div class="skill${got.some(g => g.skill === s) ? ' got' : ''}"><span class="nm">${esc(s.name)}</span>${s.level ? pips(clamp(+s.level || 0, 0, 5)) : ''}</div>`).join('')}</div>`).join('')}</div>`;
   },
   job(it) {
     const j = it.job;

@@ -14,6 +14,17 @@ const nameParts = String(CV.name).trim().split(/\s+/);
 const first = nameParts.slice(0, -1).join(' ') || CV.name, last = nameParts.length > 1 ? nameParts[nameParts.length - 1] : '';
 const tags = list => (list && list.length ? `<ul class="tags">${list.map(t => `<li>${esc(t)}</li>`).join('')}</ul>` : '');
 const extLink = (u, label) => `<a href="${esc(safeUrl(u))}" target="_blank" rel="noopener">${esc(label)}</a>`;
+const WORLDS = [
+  { id: 'about', n: 'About', c: '#2de2e6', on: true },
+  { id: 'skills', n: 'Skills', c: '#ff3cac', on: CV.skills.length > 0 },
+  { id: 'experience', n: 'Experience', c: '#ffb000', on: CV.experience.length > 0 },
+  { id: 'projects', n: 'Work', c: '#7cff4f', on: CV.projects.length > 0 },
+  { id: 'education', n: 'Education', c: '#9d7bff', on: CV.education.length > 0 },
+  { id: 'achievements', n: 'Awards', c: '#ffd23f', on: CV.achievements.length > 0 },
+  { id: 'contact', n: 'Contact', c: '#ff6b6b', on: true }
+].filter(w => w.on);
+const wno = id => WORLDS.findIndex(w => w.id === id) + 1;
+const statBars = st => (st && st.length ? `<div class="bars">${st.map((x, i) => `<div class="bar" style="--c:${CAT[i % CAT.length]}"><span>${esc(x.label)}</span><span class="tr"><i data-v="${Math.max(0, Math.min(10, +x.value || 0)) * 10}"></i></span><b>${esc(x.value)}</b></div>`).join('')}</div>` : '');
 const skillCount = CV.skills.reduce((n, c) => n + (c.items || []).length, 0);
 
 /* ---------- brand ---------- */
@@ -27,7 +38,7 @@ const hero = `
 <section class="hero wrap" id="top">
   <div class="hero-grid">
     <div class="rv">
-      <p class="eyebrow"><span class="dot"></span>PLAYER 1 · ${esc(CV.title.toUpperCase())} · OPEN TO WORK</p>
+      <p class="eyebrow"><span class="dot"></span>PLAYER 1 · ${esc(CV.title.toUpperCase())}</p>
       <h1><span>${esc(first)}</span>${last ? `<span class="outline">${esc(last)}</span>` : ''}</h1>
       <p class="typer" aria-label="${esc(CV.roles.join(', ') || CV.title)}"><span id="typed">${esc(CV.roles[0] || CV.title)}</span><span class="caret"></span></p>
       <p class="lead">${esc(a.summary || CV.tagline)}</p>
@@ -44,7 +55,7 @@ const hero = `
       </div>
     </div>
     <aside class="card rv" aria-label="Player card">
-      <div class="card-head"><span>PLAYER SELECT</span><span class="lvl">LVL ${esc(a.level || 1)}</span></div>
+      <div class="card-head"><span>PLAYER SELECT</span><span class="lvl">${a.level ? 'LVL ' + esc(a.level) : esc(CV.location ? CV.location.split(',').pop().trim().toUpperCase() : '')}</span></div>
       <div class="stage" id="stage" title="Click me">
         <span class="tip">CLICK TO JUMP</span>
         <canvas id="hero" width="96" height="144" style="width:120px;height:180px" aria-label="Pixel-art character"></canvas>
@@ -52,16 +63,16 @@ const hero = `
       </div>
       <div class="plate">
         <div><h3>${esc(last || first)}</h3><p>CLASS: ${esc((CV.roles[0] || CV.title).toUpperCase())}</p></div>
-        <div class="yrs"><b>${esc(a.years || '')}</b>YEARS XP</div>
+        <div class="yrs"><b>${esc(a.years || '')}</b>YEARS EXP</div>
       </div>
-      <div class="bars">${(a.stats || []).map((s, i) => `<div class="bar" style="--c:${CAT[i % CAT.length]}"><span>${esc(s.label)}</span><span class="tr"><i data-v="${Math.max(0, Math.min(10, +s.value || 0)) * 10}"></i></span><b>${esc(s.value)}</b></div>`).join('')}</div>
+      ${statBars(a.stats) || `<ul class="chips">${CV.skills.map((c, ci) => (c.items || []).map(x => `<li style="--c:${CAT[ci % CAT.length]}">${esc(x.name)}</li>`).join('')).join('')}</ul>`}
       <a class="btn cyan" href="play.html">▶ PRESS START</a>
     </aside>
   </div>
   <div class="strip rv">
-    <div><b data-count="${esc(a.years || '')}">${esc(a.years || '—')}</b><span>YEARS IN UNREAL<br>&amp; SOFTWARE</span></div>
-    <div><b data-count="${CV.experience.length}">${CV.experience.length}</b><span>ROLES<br>COMPLETED</span></div>
-    <div><b data-count="${skillCount}">${skillCount}</b><span>SKILLS<br>UNLOCKED</span></div>
+    <div><b data-count="${esc(a.years || '')}">${esc(a.years || '—')}</b><span>YEARS OF<br>EXPERIENCE</span></div>
+    <div><b data-count="${CV.experience.length}">${CV.experience.length}</b><span>ROLES<br>HELD</span></div>
+    <div><b data-count="${skillCount}">${skillCount}</b><span>CORE<br>SKILLS</span></div>
     ${CV.education[0] && CV.education[0].gpa ? `<div><b data-count="${CV.education[0].gpa.toFixed(2)}">${CV.education[0].gpa.toFixed(2)}</b><span>CGPA · DIPLOMA<br>IN COMP. ENGINEERING</span></div>`
       : `<div><b>${CV.projects.length}</b><span>PROJECTS</span></div>`}
   </div>
@@ -72,7 +83,7 @@ const head = (k, title, color, side = '') =>
 
 const about = `
 <section class="world wrap" id="about">
-  ${head('WORLD 1 · ABOUT', 'Player <em>profile</em>', '#2de2e6', `In the game this is the <b>Profile terminal</b>. <a href="play.html">PLAY ▸</a>`)}
+  ${head(`WORLD ${wno('about')} · ABOUT`, 'Player <em>profile</em>', '#2de2e6', `In the game this is the <b>Profile terminal</b>. <a href="play.html">PLAY ▸</a>`)}
   <div class="about">
     <div class="rv">
       ${a.summary ? `<p>${esc(a.summary)}</p>` : ''}
@@ -80,16 +91,15 @@ const about = `
       ${a.perks && a.perks.length ? `<ul class="perks">${a.perks.map((p, i) => `<li><b>PERK ${i + 1}</b><span>${esc(p)}</span></li>`).join('')}</ul>` : ''}
     </div>
     <div class="loadout rv">
-      <h3>BASE STATS · SELF-ASSESSED / 10</h3>
-      <div class="bars">${(a.stats || []).map((s, i) => `<div class="bar" style="--c:${CAT[i % CAT.length]}"><span>${esc(s.label)}</span><span class="tr"><i data-v="${Math.max(0, Math.min(10, +s.value || 0)) * 10}"></i></span><b>${esc(s.value)}</b></div>`).join('')}</div>
-      <div class="langs">Main weapon: <b style="color:#fff">${esc(CV.skills[0] && CV.skills[0].items[0] ? CV.skills[0].items.slice(0, 2).map(s => s.name).join(' + ') : '')}</b> in Unreal Engine.</div>
+      <h3>${a.stats && a.stats.length ? 'BASE STATS / 10' : 'LOADOUT'}</h3>
+      ${statBars(a.stats) || `<dl class="kit">${CV.skills.map((c, ci) => `<dt style="--c:${CAT[ci % CAT.length]}">${esc(c.category)}</dt><dd>${(c.items || []).map(x => esc(x.name)).join(' · ')}</dd>`).join('')}</dl>`}
     </div>
   </div>
 </section>`;
 
 const skills = !CV.skills.length ? '' : `
 <section class="world wrap" id="skills">
-  ${head('WORLD 2 · SKILLS', 'Skill <em>tree</em>', '#ff3cac', `${skillCount} abilities. In the game, each one is a crystal to collect.`)}
+  ${head(`WORLD ${wno('skills')} · SKILLS`, 'Skill <em>tree</em>', '#ff3cac', `${skillCount} abilities. In the game, each one is a crystal to collect.`)}
   <div class="tabs rv" role="group" aria-label="Filter skills">
     <button type="button" aria-pressed="true" data-cat="*">All</button>
     ${CV.skills.map((c, i) => `<button type="button" aria-pressed="false" data-cat="${i}" style="--c:${CAT[i % CAT.length]}">${esc(c.category)}</button>`).join('')}
@@ -98,14 +108,14 @@ const skills = !CV.skills.length ? '' : `
     ${CV.skills.map((c, ci) => (c.items || []).map(s => {
       const lv = Math.max(0, Math.min(5, +s.level || 0));
       return `<div class="skill rv" data-cat="${ci}" style="--c:${CAT[ci % CAT.length]}"><span class="gem"></span><span class="cat">${esc(c.category.toUpperCase())}</span>
-        <h3>${esc(s.name)}</h3><div class="row"><span class="pips">${[1, 2, 3, 4, 5].map(n => `<i class="${n <= lv ? 'on' : ''}"></i>`).join('')}</span><span class="lv">${LV[lv].toUpperCase()}</span></div></div>`;
+        <h3>${esc(s.name)}</h3>${lv ? `<div class="row"><span class="pips">${[1, 2, 3, 4, 5].map(n => `<i class="${n <= lv ? 'on' : ''}"></i>`).join('')}</span><span class="lv">${LV[lv].toUpperCase()}</span></div>` : ''}</div>`;
     }).join('')).join('')}
   </div>
 </section>`;
 
 const experience = !CV.experience.length ? '' : `
 <section class="world wrap" id="experience">
-  ${head('WORLD 3 · EXPERIENCE', 'Quest <em>log</em>', '#ffb000', 'Newest first. In the game, each role is a building you can walk into.')}
+  ${head(`WORLD ${wno('experience')} · EXPERIENCE`, 'Quest <em>log</em>', '#ffb000', 'Newest first. In the game, each role is a building you can walk into.')}
   <div class="timeline">
     ${CV.experience.map(j => `<article class="job rv${j.current ? ' now' : ''}">
       <div class="when"><b>${esc(j.period)}</b><span>${esc(j.duration || '')}</span></div>
@@ -122,7 +132,7 @@ const experience = !CV.experience.length ? '' : `
 
 const projects = !CV.projects.length ? '' : `
 <section class="world wrap" id="projects">
-  ${head('WORLD 4 · WORK', 'The <em>arcade</em>', '#7cff4f', 'Games and systems I have built. Each one is an arcade cabinet in the game.')}
+  ${head(`WORLD ${wno('projects')} · WORK`, 'The <em>arcade</em>', '#7cff4f', 'Games and systems I have built. Each one is an arcade cabinet in the game.')}
   <div class="projects">
     ${CV.projects.map((p, i) => { const c = PROJ_C[i % PROJ_C.length]; return `<article class="proj rv" style="--c:${c}">
       <div class="cover">${p.image ? `<img src="${esc(safeUrl(p.image))}" alt="${esc(p.title)} screenshot" loading="lazy">` : `<span class="ini">${esc(initials(p.title))}</span>`}
@@ -140,7 +150,7 @@ const projects = !CV.projects.length ? '' : `
 
 const education = !CV.education.length ? '' : `
 <section class="world wrap" id="education">
-  ${head('WORLD 5 · EDUCATION', 'Academy', '#9d7bff')}
+  ${head(`WORLD ${wno('education')} · EDUCATION`, 'Academy', '#9d7bff')}
   ${CV.education.map(e => `<article class="edu rv">
     <div><span class="per">${esc(e.period || '')}</span><h3>${esc(e.degree)}</h3><p>${esc(e.school)}${e.location ? ' · ' + esc(e.location) : ''}</p>
     ${(e.details || []).filter(d => !e.gpa || !/cgpa/i.test(d)).map(d => `<p>${esc(d)}</p>`).join('')}</div>
@@ -150,7 +160,7 @@ const education = !CV.education.length ? '' : `
 
 const achievements = !CV.achievements.length ? '' : `
 <section class="world wrap" id="achievements">
-  ${head('WORLD 6 · AWARDS', 'Trophy <em>hall</em>', '#ffd23f')}
+  ${head(`WORLD ${wno('achievements')} · AWARDS`, 'Trophy <em>hall</em>', '#ffd23f')}
   <div class="perks">${CV.achievements.map(x => `<li><b>${esc(x.year || '★')}</b><span><strong>${esc(x.title)}</strong>${x.detail ? ' — ' + esc(x.detail) : ''}</span></li>`).join('')}</div>
 </section>`;
 
@@ -172,13 +182,14 @@ const contact = `
     <div>
       <h2>▶ This resume is also a game.</h2>
       <p>Run, double-jump and squash bugs through every world above. Same info, more fun. Works on phones too.</p>
-      <div class="worlds">${['About#2de2e6', 'Skills#ff3cac', 'Experience#ffb000', 'Work#7cff4f', 'Education#9d7bff', 'Contact#ff6b6b'].map(x => { const [n, c] = x.split('#'); return `<span style="--c:#${c}">${n.toUpperCase()}</span>`; }).join('')}</div>
+      <div class="worlds">${WORLDS.map(w => `<span style="--c:${w.c}">${w.n.toUpperCase()}</span>`).join('')}</div>
     </div>
     <a class="btn primary" href="play.html">▶ Press start</a>
   </div>
   <footer><span>© ${new Date().getFullYear()} ${esc(CV.name)}</span><span>Tip: try the Konami code <kbd>↑↑↓↓←→←→BA</kbd></span></footer>
 </section>`;
 
+document.querySelectorAll('.links a').forEach(l => { const id = l.getAttribute('href').slice(1); if (!WORLDS.some(w => w.id === id)) l.remove(); });
 $('#app').innerHTML = hero + about + skills + experience + projects + education + achievements + contact;
 
 /* ---------- interactions ---------- */
@@ -328,3 +339,4 @@ function drawBg(now) {
 requestAnimationFrame(drawBg);
 if (reduce) addEventListener('scroll', () => requestAnimationFrame(drawBg), { passive: true });
 })();
+
