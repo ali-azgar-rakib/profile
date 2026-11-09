@@ -17,7 +17,7 @@ body.touch button, body.touch a { touch-action: manipulation; }
 #hud3d .ctr { font-size: 13px; background: rgba(13, 17, 18, .7); border-color: rgba(255,255,255,.18); }
 #hud3d .hbtn { font-size: 13px; text-decoration: none; color: #fff; background: rgba(13, 17, 18, .7); }
 #hud3d .map { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
-#minimap { width: 160px; height: 160px; border-radius: 50%; border: 3px solid rgba(13,17,18,.85); box-shadow: 0 6px 20px rgba(0,0,0,.4); background: #3b5a33; }
+#minimap { width: 160px; height: 160px; border-radius: 50%; border: 3px solid rgba(13,17,18,.85); box-shadow: 0 6px 20px rgba(0,0,0,.4); background: #3d8f90; }
 #nextHint { margin: 0; font-size: 12px; color: #fff; background: rgba(13,17,18,.7); padding: 5px 8px; text-align: right; max-width: 200px; line-height: 1.3; }
 #nextHint:empty { display: none; }
 
