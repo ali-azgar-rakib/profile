@@ -2,42 +2,38 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
   <title>Play — Ali Azgar Rakib</title>
-  <meta name="description" content="A playable résumé. Run through the levels to explore skills, work experience, projects, education and achievements.">
+  <meta name="description" content="Explore a 3D village and tag the characters to read Ali Azgar Rakib's CV.">
   <meta name="theme-color" content="#0d1112">
-  <meta property="og:title" content="Playable CV — Game Developer">
-  <meta property="og:description" content="My résumé is a game. Press start.">
-  <meta property="og:type" content="website">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' shape-rendering='crispEdges'%3E%3Crect width='8' height='8' fill='%230d1112'/%3E%3Crect x='2' y='1' width='4' height='3' fill='%23d9b48f'/%3E%3Crect x='2' y='0' width='4' height='1' fill='%232e2623'/%3E%3Crect x='3' y='2' width='1' height='1' fill='%230d1112'/%3E%3Crect x='5' y='2' width='1' height='1' fill='%230d1112'/%3E%3Crect x='2' y='4' width='4' height='3' fill='%236f8a86'/%3E%3Crect x='1' y='2' width='1' height='2' fill='%23b0573a'/%3E%3Crect x='6' y='2' width='1' height='2' fill='%23b0573a'/%3E%3C/svg%3E">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' shape-rendering='crispEdges'%3E%3Crect width='8' height='8' fill='%230d1112'/%3E%3Ccircle cx='4' cy='4' r='2.6' fill='none' stroke='%23d1b25a' stroke-width='.8'/%3E%3Crect x='3.6' y='0.6' width='.8' height='2' fill='%23d1b25a'/%3E%3Crect x='3.6' y='5.4' width='.8' height='2' fill='%23d1b25a'/%3E%3Crect x='.6' y='3.6' width='2' height='.8' fill='%23d1b25a'/%3E%3Crect x='5.4' y='3.6' width='2' height='.8' fill='%23d1b25a'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow:wght@400;500;600;700&family=Chakra+Petch:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/game3d.css">
 </head>
 <body>
-  <canvas id="game" tabindex="0" aria-label="Playable résumé — use the arrow keys to explore"></canvas>
-  <div id="crt" aria-hidden="true"></div>
-
-  <header id="hud" hidden>
-    <div class="hud-id"><b id="hudName"></b><span id="hudTitle"></span></div>
-    <nav id="map" aria-label="Fast travel between worlds"></nav>
-    <div class="hud-right">
-      <span class="ctr" id="ctrSkills" title="Skill crystals collected"></span>
-      <span class="ctr" id="ctrFound" title="Entries discovered"></span>
-      <span class="ctr" id="ctrBugs" title="Bugs squashed"></span>
-      <button class="hbtn" id="btnCV" title="Back to the resume page">CV</button>
+  <header id="hud3d" hidden>
+    <div class="who"><b id="hudName"></b><span id="hudTitle"></span></div>
+    <div class="mid">
+      <span class="ctr" id="ctrFound" title="Characters tagged"></span>
+      <span class="ctr" id="ctrWeather" title="Weather"></span>
+      <a class="hbtn" href="index.html" title="Back to the resume page">CV</a>
       <button class="hbtn" id="btnSound" title="Sound on/off (M)">♪</button>
       <button class="hbtn" id="btnHelp" title="Controls (H)">?</button>
     </div>
+    <div class="map"><canvas id="minimap" width="160" height="160" aria-label="Map"></canvas><p id="nextHint"></p></div>
   </header>
 
+  <div id="crosshair" hidden><i></i><span id="aimTip"></span></div>
   <div id="banner" aria-live="polite"></div>
   <div id="toast" role="status" aria-live="polite"></div>
+  <div id="flashOverlay" aria-hidden="true"></div>
 
-  <div id="touch" aria-hidden="true">
-    <div class="pad"><button data-k="left">◀</button><button data-k="right">▶</button></div>
-    <div class="pad"><button data-k="act" class="act">E</button><button data-k="jump" class="jump">▲</button></div>
+  <div id="touch3d" aria-hidden="true">
+    <div id="joy"><i></i></div>
+    <div class="tbtns"><button id="tJump" type="button">▲</button><button id="tFire" type="button">●</button></div>
   </div>
 
   <div id="modal" hidden>
@@ -45,21 +41,17 @@
     <article class="panel" role="dialog" aria-modal="true" aria-labelledby="panelTitle">
       <button class="x" data-close aria-label="Close">✕</button>
       <div id="panelBody"></div>
-      <p class="panel-hint">ESC TO CLOSE</p>
+      <p class="panel-hint">ESC OR ✕ TO CLOSE · CLICK TO KEEP PLAYING</p>
     </article>
   </div>
 
   <section id="title" class="screen" aria-label="Start screen"></section>
-  <section id="end" class="screen" hidden aria-label="Level complete"></section>
-  <main id="cv" hidden></main>
+  <section id="pause" class="screen" hidden aria-label="Paused"></section>
+  <section id="end" class="screen" hidden aria-label="All characters found"></section>
 
-  <noscript>
-    <p style="color:#fff;font-family:sans-serif;padding:2rem;position:relative;z-index:99">
-      This playable CV needs JavaScript. Please enable it, or contact me directly.
-    </p>
-  </noscript>
+  <noscript><p style="color:#fff;padding:2rem;font-family:sans-serif">This game needs JavaScript. <a href="index.html">Open the resume page</a>.</p></noscript>
 
   <script src="js/data.js"></script>
-  <script src="js/game.js"></script>
+  <script type="module" src="js/game3d.js"></script>
 </body>
 </html>

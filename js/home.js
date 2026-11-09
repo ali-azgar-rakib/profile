@@ -83,7 +83,7 @@ const head = (k, title, color, side = '') =>
 
 const about = `
 <section class="world wrap" id="about">
-  ${head(`WORLD ${wno('about')} · ABOUT`, 'Player <em>profile</em>', '#6fa3a0', `In the game this is the <b>Profile terminal</b>. <a href="play.html">PLAY ▸</a>`)}
+  ${head('ABOUT', 'Player <em>profile</em>', '#6fa3a0', `In the 3D game, the village guide holds this sign. <a href="play.html">PLAY ▸</a>`)}
   <div class="about">
     <div class="rv">
       ${a.summary ? `<p>${esc(a.summary)}</p>` : ''}
@@ -99,7 +99,7 @@ const about = `
 
 const skills = !CV.skills.length ? '' : `
 <section class="world wrap" id="skills">
-  ${head(`WORLD ${wno('skills')} · SKILLS`, 'Skill <em>tree</em>', '#b0573a', `${skillCount} abilities. In the game, each one is a crystal to collect.`)}
+  ${head('SKILLS', 'Skill <em>tree</em>', '#b0573a', `${skillCount} skills. In the game, the animals carry them in crates.`)}
   <div class="tabs rv" role="group" aria-label="Filter skills">
     <button type="button" aria-pressed="true" data-cat="*">All</button>
     ${CV.skills.map((c, i) => `<button type="button" aria-pressed="false" data-cat="${i}" style="--c:${CAT[i % CAT.length]}">${esc(c.category)}</button>`).join('')}
@@ -115,7 +115,7 @@ const skills = !CV.skills.length ? '' : `
 
 const experience = !CV.experience.length ? '' : `
 <section class="world wrap" id="experience">
-  ${head(`WORLD ${wno('experience')} · EXPERIENCE`, 'Quest <em>log</em>', '#c99a45', 'Newest first. In the game, each role is a building you can walk into.')}
+  ${head('EXPERIENCE', 'Quest <em>log</em>', '#c99a45', 'Newest first. In the game, each role is carried by a villager.')}
   <div class="timeline">
     ${CV.experience.map(j => `<article class="job rv${j.current ? ' now' : ''}">
       <div class="when"><b>${esc(j.period)}</b><span>${esc(j.duration || '')}</span></div>
@@ -132,7 +132,7 @@ const experience = !CV.experience.length ? '' : `
 
 const projects = !CV.projects.length ? '' : `
 <section class="world wrap" id="projects">
-  ${head(`WORLD ${wno('projects')} · WORK`, 'The <em>arcade</em>', '#7e9a5c', 'Games and systems I have built. Each one is an arcade cabinet in the game.')}
+  ${head('WORK', 'The <em>arcade</em>', '#7e9a5c', 'Games and systems I have built.')}
   <div class="projects">
     ${CV.projects.map((p, i) => { const c = PROJ_C[i % PROJ_C.length]; return `<article class="proj rv" style="--c:${c}">
       <div class="cover">${p.image ? `<img src="${esc(safeUrl(p.image))}" alt="${esc(p.title)} screenshot" loading="lazy">` : `<span class="ini">${esc(initials(p.title))}</span>`}
@@ -150,7 +150,7 @@ const projects = !CV.projects.length ? '' : `
 
 const education = !CV.education.length ? '' : `
 <section class="world wrap" id="education">
-  ${head(`WORLD ${wno('education')} · EDUCATION`, 'Academy', '#9a8fb0')}
+  ${head('EDUCATION', 'Academy', '#9a8fb0')}
   ${CV.education.map(e => `<article class="edu rv">
     <div><span class="per">${esc(e.period || '')}</span><h3>${esc(e.degree)}</h3><p>${esc(e.school)}${e.location ? ' · ' + esc(e.location) : ''}</p>
     ${(e.details || []).filter(d => !e.gpa || !/cgpa/i.test(d)).map(d => `<p>${esc(d)}</p>`).join('')}</div>
@@ -160,7 +160,7 @@ const education = !CV.education.length ? '' : `
 
 const achievements = !CV.achievements.length ? '' : `
 <section class="world wrap" id="achievements">
-  ${head(`WORLD ${wno('achievements')} · AWARDS`, 'Trophy <em>hall</em>', '#d1b25a')}
+  ${head('AWARDS', 'Trophy <em>hall</em>', '#d1b25a')}
   <div class="perks">${CV.achievements.map(x => `<li><b>${esc(x.year || '★')}</b><span><strong>${esc(x.title)}</strong>${x.detail ? ' — ' + esc(x.detail) : ''}</span></li>`).join('')}</div>
 </section>`;
 
@@ -180,13 +180,13 @@ const contact = `
   </div>
   <div class="gameband rv">
     <div>
-      <h2>▶ This resume is also a game.</h2>
-      <p>Run, double-jump and squash bugs through every world above. Same info, more fun. Works on phones too.</p>
-      <div class="worlds">${WORLDS.map(w => `<span style="--c:${w.c}">${w.n.toUpperCase()}</span>`).join('')}</div>
+      <h2>▶ This resume is also a 3D game.</h2>
+      <p>Walk around a 3D village with a river, houses, forest and changing weather. Every villager and animal carries part of this CV; tag them with the blaster to read it. Works on phones too.</p>
+      <div class="worlds">${['3D village#6fa3a0', 'River & forest#7e9a5c', 'Rain cycle#9a8fb0', `${2 + CV.skills.length + CV.experience.length + CV.projects.length + CV.education.length + CV.achievements.length} characters#c99a45`].map(x => { const [n, c] = x.split('#'); return `<span style="--c:#${c}">${n.toUpperCase()}</span>`; }).join('')}</div>
     </div>
     <a class="btn primary" href="play.html">▶ Press start</a>
   </div>
-  <footer><span>© ${new Date().getFullYear()} ${esc(CV.name)}</span><span>Tip: try the Konami code <kbd>↑↑↓↓←→←→BA</kbd></span></footer>
+  <footer><span>© ${new Date().getFullYear()} ${esc(CV.name)}</span><span>Tip: the Konami code opens the game <kbd>↑↑↓↓←→←→BA</kbd></span></footer>
 </section>`;
 
 document.querySelectorAll('.links a').forEach(l => { const id = l.getAttribute('href').slice(1); if (!WORLDS.some(w => w.id === id)) l.remove(); });

@@ -6,19 +6,8 @@ A static, no-build website with two pages that share one data file:
 
 - **`index.html`** — interactive resume homepage (synthwave theme, skill filters, quest-log timeline,
   copy-to-clipboard contact). *Save as PDF* prints a clean white one-page-style resume.
-- **`play.html`** — the same resume as a neon side-scrolling platformer. Every world is a CV section.
+- **`play.html`** — the same resume as a 3D open-world game (Three.js): roam a village with houses, a river, forest and a rain cycle. Every villager and animal carries part of the CV — tag them with the blaster to read it.
 
-| World | Section | What's in the level |
-|---|---|---|
-| 1 · Player Select | About | Your name in lights + a **Profile** terminal (summary, RPG stats, perks, links) |
-| 2 · Skill Caverns | Skills | One collectible **crystal per skill** + a Skill Tree terminal |
-| 3 · Quest Log City | Experience | One **building per job** — walk in the door to read it |
-| 4 · The Arcade | Projects | One **arcade cabinet per project** (screenshot or YouTube trailer, tech, links) |
-| 5 · Academy Peaks | Education | One **tower per degree / certificate** |
-| 6 · Trophy Hall | Achievements | Trophies on pedestals — jump up to claim them |
-| 7 · Final Castle | Contact | Mailbox with email/links, finish flag → score screen |
-
-Bugs 🐞 patrol some levels — jump on them to "fix" them.
 
 ## 1. Edit your content
 
@@ -30,7 +19,7 @@ that world, etc.
 - `video:` accepts a YouTube link or ID and shows the trailer inside the project panel.
 - Leave a field as `""` to hide it.
 
-Preview locally by double-clicking `index.html` (resume) or `play.html` (game).
+Preview locally: double-click `index.html` for the resume. The 3D game uses JavaScript modules, so run a tiny local server first (`python -m http.server` in this folder, then open http://localhost:8000/play.html).
 
 ## 2. Put it online (free)
 
@@ -49,17 +38,13 @@ Preview locally by double-clicking `index.html` (resume) or `play.html` (game).
 ## Handy links to share
 - `https://ali-azgar-rakib.github.io/profile/` — the resume homepage
 - `https://ali-azgar-rakib.github.io/profile/play.html` — the game
-- `https://ali-azgar-rakib.github.io/profile/play.html#projects` — starts the game at a world (`#skills`, `#experience`, `#education`, `#contact`)
 
 ## Controls
-`← →` / `A D` move · `Space` / `W` / `↑` jump (twice for double jump) · `↓ + Space` drop through platforms ·
-`E` / `Enter` open · `1–7` fast travel (or click the map bar) · `M` sound · `Esc` close.
-Phones and tablets get on-screen buttons automatically.
+Desktop: `WASD` walk · mouse look · click to tag · `Shift` run · `Space` jump · `M` sound · `Esc` release mouse.
+Phones: left stick to walk, drag to look, ● to tag, ▲ to jump.
 
 ## Customising further
-- World names & colours: `ZONE_DEFS` near the top of `js/game.js`.
-- Player sprite: `PAL` (colours) and `BODY` (8×12 pixel map) in `js/game.js` — recolour the hoodie to your brand.
-- Physics feel: `PHYS` in `js/game.js`.
-- Sounds are synthesised in code (no audio files); visitors can mute with `M`.
+- Characters, colours and world layout: `js/game3d.js` (`buildNPCs`, `SPECIES`, `PEOPLE`, `ACCENT`).
+- Three.js is bundled in `js/vendor/` (MIT licence), so the site needs no CDN.
 
-No frameworks, no build step, no tracking. Fonts: Press Start 2P & Space Grotesk via Google Fonts.
+No build step, no tracking. Fonts: Press Start 2P & Space Grotesk via Google Fonts.
