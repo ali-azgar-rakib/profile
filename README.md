@@ -4,8 +4,8 @@ Live: **https://ali-azgar-rakib.github.io/profile/**
 
 A static, no-build website with two pages that share one data file:
 
-- **`index.html`** — interactive resume homepage (synthwave theme, skill filters, quest-log timeline,
-  copy-to-clipboard contact). *Save as PDF* prints a clean white one-page-style resume.
+- **`index.html`** — a clean, readable resume page (light and dark mode, copy-to-clipboard email).
+  *Save as PDF* prints a plain resume.
 - **`play.html`** — the same resume as a 3D open-world game (Three.js): roam a village with houses, a river, forest and a rain cycle. Every villager and animal carries part of the CV — tag them with the blaster to read it.
 
 

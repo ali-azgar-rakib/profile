@@ -4,40 +4,39 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Ali Azgar Rakib — Unreal Engine Developer</title>
-  <meta name="description" content="Ali Azgar Rakib — Game Programmer and Unreal Engine Developer. Gameplay, AI, animation and multiplayer systems in C++ and Blueprint. Explore the resume or play it as a game.">
-  <meta name="theme-color" content="#0d1112">
+  <meta name="description" content="Ali Azgar Rakib — Game Programmer and Unreal Engine Developer. Gameplay, AI, animation and multiplayer systems in C++ and Blueprint.">
+  <meta name="theme-color" content="#f6f7f4" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#111615" media="(prefers-color-scheme: dark)">
   <meta property="og:title" content="Ali Azgar Rakib — Unreal Engine Developer">
-  <meta property="og:description" content="Gameplay, AI and multiplayer in Unreal Engine. My resume is also a game — press start.">
+  <meta property="og:description" content="Gameplay, AI and multiplayer in Unreal Engine. My resume is also a 3D game.">
   <meta property="og:type" content="website">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' shape-rendering='crispEdges'%3E%3Crect width='8' height='8' fill='%230d1112'/%3E%3Crect x='2' y='1' width='4' height='3' fill='%23d9b48f'/%3E%3Crect x='2' y='0' width='4' height='1' fill='%232e2623'/%3E%3Crect x='3' y='2' width='1' height='1' fill='%230d1112'/%3E%3Crect x='5' y='2' width='1' height='1' fill='%230d1112'/%3E%3Crect x='2' y='4' width='4' height='3' fill='%236f8a86'/%3E%3Crect x='1' y='2' width='1' height='2' fill='%23b0573a'/%3E%3Crect x='6' y='2' width='1' height='2' fill='%23b0573a'/%3E%3C/svg%3E">
+  <meta property="og:image" content="assets/game-preview.jpg">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231f6f6b'/%3E%3Ctext x='16' y='21.5' font-family='Arial' font-weight='700' font-size='14' fill='white' text-anchor='middle'%3EAR%3C/text%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Chakra+Petch:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/home.css?v=village2">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/home.css?v=clean2">
 </head>
 <body>
-  <canvas id="bg" aria-hidden="true"></canvas>
-  <div class="scan" aria-hidden="true"></div>
-
-  <header class="nav" id="nav">
-    <div class="nav-in">
-      <a class="brand" href="#top" aria-label="Back to top"><span class="brand-mark" id="brandMark"></span><span class="brand-name" id="brandName"></span></a>
-      <nav class="links" aria-label="Sections">
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="topbar">
+    <div class="wrap topbar-in">
+      <a class="brand" href="#top"><span class="mark" id="brandMark">AR</span><span class="brand-name" id="brandName"></span></a>
+      <nav class="nav" aria-label="Sections">
         <a href="#about">About</a><a href="#skills">Skills</a><a href="#experience">Experience</a>
         <a href="#projects">Work</a><a href="#education">Education</a><a href="#contact">Contact</a>
       </nav>
-      <a class="play-btn" href="play.html"><span class="tri">▶</span> Play my CV</a>
+      <a class="btn btn-play btn-sm" href="play.html"><span aria-hidden="true">▶</span> Play the 3D CV</a>
     </div>
-    <div class="xp" aria-hidden="true"><i id="xpBar"></i></div>
   </header>
 
-  <main id="app">
-    <noscript><p style="padding:2rem;color:#fff">This page needs JavaScript to show the resume.</p></noscript>
+  <main id="main">
+    <noscript><p class="wrap" style="padding-block:40px">This page needs JavaScript to show the resume.</p></noscript>
   </main>
 
   <div id="toast" role="status" aria-live="polite"></div>
 
-  <script src="js/data.js?v=village2"></script>
-  <script src="js/home.js?v=village2"></script>
+  <script src="js/data.js?v=clean2"></script>
+  <script src="js/home.js?v=clean2"></script>
 </body>
 </html>
