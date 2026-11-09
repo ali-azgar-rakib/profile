@@ -26,12 +26,10 @@ $('#brandMark').textContent = initials;
 $('#brandName').textContent = CV.name;
 document.title = `${CV.name} — ${roles[roles.length - 1]}`;
 const a = CV.about || {};
-const edu0 = CV.education[0];
 const factList = [
   a.years && [a.years, 'years of experience'],
   [String(CV.experience.length), CV.experience.length === 1 ? 'role' : 'roles'],
-  [String(skillCount), 'core skills'],
-  edu0 && edu0.gpa ? [(+edu0.gpa).toFixed(2), `CGPA, ${edu0.degree.replace(/^Diploma in /i, 'Diploma · ')}`] : null
+  [String(skillCount), 'core skills']
 ].filter(Boolean);
 
 const hero = `
