@@ -7,21 +7,21 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': 
 const safeUrl = u => { u = String(u || '').trim(); return /^(javascript|data|vbscript):/i.test(u) ? '' : u; };
 const initials = s => String(s || '?').split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase();
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const CAT = ['#2de2e6', '#ff3cac', '#ffb000', '#7cff4f', '#9d7bff', '#ff6b6b'];
+const CAT = ['#6fa3a0', '#b0573a', '#c99a45', '#7e9a5c', '#9a8fb0', '#c4705a'];
 const LV = ['', 'Novice', 'Skilled', 'Proficient', 'Advanced', 'Expert'];
-const PROJ_C = ['#7cff4f', '#2de2e6', '#ff3cac', '#ffb000', '#9d7bff'];
+const PROJ_C = ['#7e9a5c', '#6fa3a0', '#b0573a', '#c99a45', '#9a8fb0'];
 const nameParts = String(CV.name).trim().split(/\s+/);
 const first = nameParts.slice(0, -1).join(' ') || CV.name, last = nameParts.length > 1 ? nameParts[nameParts.length - 1] : '';
 const tags = list => (list && list.length ? `<ul class="tags">${list.map(t => `<li>${esc(t)}</li>`).join('')}</ul>` : '');
 const extLink = (u, label) => `<a href="${esc(safeUrl(u))}" target="_blank" rel="noopener">${esc(label)}</a>`;
 const WORLDS = [
-  { id: 'about', n: 'About', c: '#2de2e6', on: true },
-  { id: 'skills', n: 'Skills', c: '#ff3cac', on: CV.skills.length > 0 },
-  { id: 'experience', n: 'Experience', c: '#ffb000', on: CV.experience.length > 0 },
-  { id: 'projects', n: 'Work', c: '#7cff4f', on: CV.projects.length > 0 },
-  { id: 'education', n: 'Education', c: '#9d7bff', on: CV.education.length > 0 },
-  { id: 'achievements', n: 'Awards', c: '#ffd23f', on: CV.achievements.length > 0 },
-  { id: 'contact', n: 'Contact', c: '#ff6b6b', on: true }
+  { id: 'about', n: 'About', c: '#6fa3a0', on: true },
+  { id: 'skills', n: 'Skills', c: '#b0573a', on: CV.skills.length > 0 },
+  { id: 'experience', n: 'Experience', c: '#c99a45', on: CV.experience.length > 0 },
+  { id: 'projects', n: 'Work', c: '#7e9a5c', on: CV.projects.length > 0 },
+  { id: 'education', n: 'Education', c: '#9a8fb0', on: CV.education.length > 0 },
+  { id: 'achievements', n: 'Awards', c: '#d1b25a', on: CV.achievements.length > 0 },
+  { id: 'contact', n: 'Contact', c: '#c4705a', on: true }
 ].filter(w => w.on);
 const wno = id => WORLDS.findIndex(w => w.id === id) + 1;
 const statBars = st => (st && st.length ? `<div class="bars">${st.map((x, i) => `<div class="bar" style="--c:${CAT[i % CAT.length]}"><span>${esc(x.label)}</span><span class="tr"><i data-v="${Math.max(0, Math.min(10, +x.value || 0)) * 10}"></i></span><b>${esc(x.value)}</b></div>`).join('')}</div>` : '');
@@ -83,7 +83,7 @@ const head = (k, title, color, side = '') =>
 
 const about = `
 <section class="world wrap" id="about">
-  ${head(`WORLD ${wno('about')} · ABOUT`, 'Player <em>profile</em>', '#2de2e6', `In the game this is the <b>Profile terminal</b>. <a href="play.html">PLAY ▸</a>`)}
+  ${head(`WORLD ${wno('about')} · ABOUT`, 'Player <em>profile</em>', '#6fa3a0', `In the game this is the <b>Profile terminal</b>. <a href="play.html">PLAY ▸</a>`)}
   <div class="about">
     <div class="rv">
       ${a.summary ? `<p>${esc(a.summary)}</p>` : ''}
@@ -99,7 +99,7 @@ const about = `
 
 const skills = !CV.skills.length ? '' : `
 <section class="world wrap" id="skills">
-  ${head(`WORLD ${wno('skills')} · SKILLS`, 'Skill <em>tree</em>', '#ff3cac', `${skillCount} abilities. In the game, each one is a crystal to collect.`)}
+  ${head(`WORLD ${wno('skills')} · SKILLS`, 'Skill <em>tree</em>', '#b0573a', `${skillCount} abilities. In the game, each one is a crystal to collect.`)}
   <div class="tabs rv" role="group" aria-label="Filter skills">
     <button type="button" aria-pressed="true" data-cat="*">All</button>
     ${CV.skills.map((c, i) => `<button type="button" aria-pressed="false" data-cat="${i}" style="--c:${CAT[i % CAT.length]}">${esc(c.category)}</button>`).join('')}
@@ -115,7 +115,7 @@ const skills = !CV.skills.length ? '' : `
 
 const experience = !CV.experience.length ? '' : `
 <section class="world wrap" id="experience">
-  ${head(`WORLD ${wno('experience')} · EXPERIENCE`, 'Quest <em>log</em>', '#ffb000', 'Newest first. In the game, each role is a building you can walk into.')}
+  ${head(`WORLD ${wno('experience')} · EXPERIENCE`, 'Quest <em>log</em>', '#c99a45', 'Newest first. In the game, each role is a building you can walk into.')}
   <div class="timeline">
     ${CV.experience.map(j => `<article class="job rv${j.current ? ' now' : ''}">
       <div class="when"><b>${esc(j.period)}</b><span>${esc(j.duration || '')}</span></div>
@@ -132,7 +132,7 @@ const experience = !CV.experience.length ? '' : `
 
 const projects = !CV.projects.length ? '' : `
 <section class="world wrap" id="projects">
-  ${head(`WORLD ${wno('projects')} · WORK`, 'The <em>arcade</em>', '#7cff4f', 'Games and systems I have built. Each one is an arcade cabinet in the game.')}
+  ${head(`WORLD ${wno('projects')} · WORK`, 'The <em>arcade</em>', '#7e9a5c', 'Games and systems I have built. Each one is an arcade cabinet in the game.')}
   <div class="projects">
     ${CV.projects.map((p, i) => { const c = PROJ_C[i % PROJ_C.length]; return `<article class="proj rv" style="--c:${c}">
       <div class="cover">${p.image ? `<img src="${esc(safeUrl(p.image))}" alt="${esc(p.title)} screenshot" loading="lazy">` : `<span class="ini">${esc(initials(p.title))}</span>`}
@@ -150,7 +150,7 @@ const projects = !CV.projects.length ? '' : `
 
 const education = !CV.education.length ? '' : `
 <section class="world wrap" id="education">
-  ${head(`WORLD ${wno('education')} · EDUCATION`, 'Academy', '#9d7bff')}
+  ${head(`WORLD ${wno('education')} · EDUCATION`, 'Academy', '#9a8fb0')}
   ${CV.education.map(e => `<article class="edu rv">
     <div><span class="per">${esc(e.period || '')}</span><h3>${esc(e.degree)}</h3><p>${esc(e.school)}${e.location ? ' · ' + esc(e.location) : ''}</p>
     ${(e.details || []).filter(d => !e.gpa || !/cgpa/i.test(d)).map(d => `<p>${esc(d)}</p>`).join('')}</div>
@@ -160,7 +160,7 @@ const education = !CV.education.length ? '' : `
 
 const achievements = !CV.achievements.length ? '' : `
 <section class="world wrap" id="achievements">
-  ${head(`WORLD ${wno('achievements')} · AWARDS`, 'Trophy <em>hall</em>', '#ffd23f')}
+  ${head(`WORLD ${wno('achievements')} · AWARDS`, 'Trophy <em>hall</em>', '#d1b25a')}
   <div class="perks">${CV.achievements.map(x => `<li><b>${esc(x.year || '★')}</b><span><strong>${esc(x.title)}</strong>${x.detail ? ' — ' + esc(x.detail) : ''}</span></li>`).join('')}</div>
 </section>`;
 
@@ -168,7 +168,7 @@ const tel = String(CV.phone || '').replace(/[^+\d]/g, '');
 const contact = `
 <section class="world wrap" id="contact">
   <div class="contact rv">
-    <p class="eyebrow" style="color:#ff6b6b;margin:0"><span class="dot" style="background:#ff6b6b;box-shadow:0 0 10px #ff6b6b"></span>FINAL WORLD · CONTACT</p>
+    <p class="eyebrow" style="color:#c4705a;margin:0"><span class="dot" style="background:#c4705a"></span>FINAL WORLD · CONTACT</p>
     <h2>${esc(CV.contact.heading || "Let's work together")}</h2>
     ${CV.contact.message ? `<p class="msg">${esc(CV.contact.message)}</p>` : ''}
     <div class="channels">
@@ -273,7 +273,7 @@ const K = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRi
 addEventListener('keydown', e => { kp = (e.key === K[kp] || e.key.toLowerCase() === K[kp]) ? kp + 1 : (e.key === K[0] ? 1 : 0); if (kp === K.length) { toast('CHEAT CODE ACCEPTED'); setTimeout(() => (location.href = 'play.html'), 700); } });
 
 /* ---------- hero pixel character (same sprite as the game) ---------- */
-const PAL = { H: '#3b2468', P: '#ff3cac', S: '#ffcf9e', E: '#0b0820', J: '#2de2e6', K: '#179ca0', T: '#f3eefe', L: '#4b3fa8', B: '#1b1240' };
+const PAL = { H: '#2e2623', P: '#b0573a', S: '#d9b48f', E: '#101414', J: '#6f8a86', K: '#4d6360', T: '#d9d3c3', L: '#3d4746', B: '#1a1f1f' };
 const BODY = ['..HHHH..', '.HHHHHH.', 'PHSSSSHP', 'PSESSESP', '.SSSSSS.', '..JJJJ..', '.JJTTJJ.', 'SJJTTJJS', 'SJKTTKJS', '.JJJJJJ.'];
 const LEGS = { idle: ['.LL..LL.', '.BB..BB.'], jump: ['.LL..LL.', 'BB....BB'] };
 const hc = $('#hero'), hx = hc.getContext('2d'), stage = $('#stage');
@@ -295,45 +295,77 @@ hc.width = 96; hc.height = 144; hc.style.width = '96px'; hc.style.height = '144p
 requestAnimationFrame(drawHero);
 stage.addEventListener('click', () => { if (jumpT < 0) jumpT = performance.now(); });
 
-/* ---------- synthwave background ---------- */
+/* ---------- rainy ruins background ---------- */
 const bg = $('#bg'), g = bg.getContext('2d');
 let W, H, dpr;
-const stars = Array.from({ length: 150 }, () => ({ x: Math.random(), y: Math.random() * 0.75, s: Math.random() < 0.12 ? 2 : 1, tw: 0.5 + Math.random() * 2.5, p: Math.random() * 6 }));
+function rr(seed) { return () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }; }
+const R0 = rr(11);
+const ruins = [0.1, 0.3, 0.55].map((p, li) => {
+  const items = []; let x = -100;
+  while (x < 3600) { const w = 24 + R0() * (90 - li * 20), h = 60 + R0() * (240 - li * 60); items.push({ x, w, h, k: R0(), pipe: R0() < 0.4, lamp: R0() < 0.16, s: R0() * 999 }); x += w + R0() * 40; }
+  return { p, items, col: ['#253031', '#1a2223', '#111717'][li] };
+});
+const drops = Array.from({ length: 220 }, () => ({ x: Math.random(), y: Math.random(), l: 10 + Math.random() * 22, v: 0.9 + Math.random() * 0.6, a: 0.06 + Math.random() * 0.2 }));
+const hsh = n => { const v = Math.sin(n * 127.1 + 311.7) * 43758.5453; return v - Math.floor(v); };
+let flash = 0, nextFlash = 5, lastT = performance.now();
 function size() { dpr = Math.min(devicePixelRatio || 1, 1.5); W = innerWidth; H = innerHeight; bg.width = W * dpr; bg.height = H * dpr; }
 size(); addEventListener('resize', size);
 function drawBg(now) {
-  const t = now / 1000, sc = scrollY;
+  const t = now / 1000, dt = Math.min(0.05, (now - lastT) / 1000), sc = scrollY; lastT = now;
+  flash = Math.max(0, flash - dt * 2.5); nextFlash -= dt;
+  if (!reduce && nextFlash <= 0) { flash = 1; nextFlash = 10 + Math.random() * 16; }
   g.setTransform(dpr, 0, 0, dpr, 0, 0);
-  const hz = H * 0.66; // horizon
+  const hz = H * 0.78;
   const sky = g.createLinearGradient(0, 0, 0, hz);
-  sky.addColorStop(0, '#05031a'); sky.addColorStop(0.6, '#140a35'); sky.addColorStop(1, '#3a1050');
-  g.fillStyle = sky; g.fillRect(0, 0, W, hz + 1);
-  stars.forEach(s => { g.fillStyle = `rgba(255,255,255,${0.25 + 0.6 * Math.abs(Math.sin(t * s.tw + s.p))})`; g.fillRect(s.x * W, (s.y * hz - sc * 0.05 * s.s) % hz, s.s, s.s); });
-  // sun
-  const R = Math.min(W, H) * 0.2, cx = W * 0.78, cy = hz - R * 0.25 + Math.min(sc * 0.15, R);
-  const halo = g.createRadialGradient(cx, cy, R * 0.5, cx, cy, R * 2.4); halo.addColorStop(0, 'rgba(255,60,172,.28)'); halo.addColorStop(1, 'rgba(255,60,172,0)');
-  g.fillStyle = halo; g.fillRect(0, 0, W, hz);
-  g.save(); g.beginPath(); g.rect(0, 0, W, hz); g.clip();
-  const sg = g.createLinearGradient(0, cy - R, 0, cy + R); sg.addColorStop(0, '#ffe66d'); sg.addColorStop(0.5, '#ff8a5b'); sg.addColorStop(1, '#ff3cac');
-  g.fillStyle = sg; g.beginPath(); g.arc(cx, cy, R, 0, Math.PI * 2); g.fill();
-  g.fillStyle = sky; for (let i = 0; i < 8; i++) g.fillRect(cx - R, cy + R * 0.05 + i * (R * 0.07 + i * R * 0.02), R * 2, 1 + i * 1.3);
-  g.restore();
-  // mountains silhouette
-  g.fillStyle = '#120a2c'; g.beginPath(); g.moveTo(0, hz);
-  for (let x = 0; x <= W; x += 40) g.lineTo(x, hz - 18 - Math.abs(Math.sin(x * 0.011) * 46 + Math.sin(x * 0.037) * 16));
-  g.lineTo(W, hz); g.fill();
-  // floor + perspective grid
-  g.fillStyle = '#0a0618'; g.fillRect(0, hz, W, H - hz);
-  g.strokeStyle = 'rgba(255,60,172,.55)'; g.lineWidth = 1;
-  const off = reduce ? 0 : (t * 0.6) % 1;
-  for (let i = 0; i < 18; i++) { const z = (i + off) / 18, y = hz + (H - hz) * Math.pow(z, 2.2); g.globalAlpha = 0.15 + z * 0.75; g.beginPath(); g.moveTo(0, y); g.lineTo(W, y); g.stroke(); }
-  g.globalAlpha = 0.5;
-  for (let i = -24; i <= 24; i++) { const x0 = W / 2 + i * 28, x1 = W / 2 + i * 260; g.beginPath(); g.moveTo(x0, hz); g.lineTo(x1, H); g.stroke(); }
+  sky.addColorStop(0, '#0a0e0f'); sky.addColorStop(0.55, '#1a2324'); sky.addColorStop(1, '#36423f');
+  g.fillStyle = sky; g.fillRect(0, 0, W, H);
+  // drifting cloud bands
+  for (let i = 0; i < 5; i++) {
+    const y = hz * (0.06 + i * 0.12), off = ((t * (5 + i * 2)) % (W + 700)) - 350;
+    g.fillStyle = `rgba(${i % 2 ? '60,70,69' : '42,51,51'},${0.32 - i * 0.04})`;
+    for (let k = -1; k < 3; k++) { g.beginPath(); g.ellipse(off + k * (W / 2 + 220), y, W * 0.34, 30, 0, 0, Math.PI * 2); g.fill(); }
+  }
+  if (flash > 0) { g.fillStyle = `rgba(205,214,210,${flash * 0.3})`; g.fillRect(0, 0, W, hz); }
+  // ruin silhouettes in three depths
+  ruins.forEach((L, li) => {
+    const off = -(sc * L.p * 0.35) % 3600, base = hz + li * 26;
+    const col = flash > 0 ? `rgb(${[37, 26, 17][li] + flash * 30},${[48, 34, 23][li] + flash * 30},${[49, 35, 23][li] + flash * 30})` : L.col;
+    g.fillStyle = col; g.strokeStyle = col; g.lineWidth = 1.5;
+    for (const b of L.items) {
+      for (const rep of [0, 3600]) {
+        const x = b.x + off + rep; if (x > W + 60 || x + b.w < -60) continue;
+        const top = base - b.h;
+        if (b.k < 0.3) { g.fillRect(x + b.w * 0.3, top - 40, b.w * 0.22, 40); g.fillRect(x, top + 30, b.w, b.h); }
+        else if (b.k < 0.5) { g.fillRect(x, top + 18, b.w, b.h); g.beginPath(); g.ellipse(x + b.w / 2, top + 18, b.w / 2, 16, 0, Math.PI, 0); g.fill(); }
+        else { g.fillRect(x, top, b.w, b.h + 40); for (let k = 0; k < b.w; k += 9) if (hsh(b.s + k) > 0.5) g.fillRect(x + k, top - 5 - hsh(b.s * 3 + k) * 9, 5, 9); }
+        if (b.pipe) { g.fillRect(x - 26, top + b.h * 0.35, b.w + 52, 5); }
+        if (hsh(b.s * 7) > 0.55) { g.beginPath(); g.moveTo(x + b.w, top + 12); g.quadraticCurveTo(x + b.w + 22, top + 42 + Math.sin(t + b.s) * 2, x + b.w + 44, top + 18); g.stroke(); }
+      }
+    }
+    for (const b of L.items) {
+      if (!b.lamp) continue;
+      for (const rep of [0, 3600]) {
+        const x = b.x + off + rep + b.w / 2, y = base - b.h + 26; if (x < -40 || x > W + 40) continue;
+        const on = hsh(Math.floor(t * 4) + b.s) > 0.05, rg = g.createRadialGradient(x, y, 0, x, y, 34);
+        rg.addColorStop(0, `rgba(217,164,65,${on ? 0.28 : 0.05})`); rg.addColorStop(1, 'rgba(217,164,65,0)');
+        g.fillStyle = rg; g.fillRect(x - 34, y - 34, 68, 68);
+        g.fillStyle = on ? 'rgba(233,190,104,.9)' : 'rgba(120,100,60,.5)'; g.fillRect(x - 1.5, y - 1.5, 3, 3);
+      }
+    }
+    const fog = g.createLinearGradient(0, base - 200, 0, base + 40);
+    fog.addColorStop(0, 'rgba(60,72,70,0)'); fog.addColorStop(1, `rgba(60,72,70,${0.4 - li * 0.08})`);
+    g.fillStyle = fog; g.fillRect(0, base - 200, W, 240);
+  });
+  g.fillStyle = '#0f1414'; g.fillRect(0, hz + 52, W, H);
+  // rain
+  g.strokeStyle = 'rgb(190,205,200)'; g.lineWidth = 1;
+  for (const d of drops) {
+    const y = ((d.y * H + (reduce ? 0 : t * H * 1.3 * d.v)) % (H + 60)) - 30, x = ((d.x * (W + 200) - y * 0.18) % (W + 200) + W + 200) % (W + 200) - 100;
+    g.globalAlpha = d.a; g.beginPath(); g.moveTo(x, y); g.lineTo(x - d.l * 0.09, y - d.l * 0.5); g.stroke();
+  }
   g.globalAlpha = 1;
-  g.fillStyle = '#ff3cac'; g.fillRect(0, hz - 1, W, 2);
-  // fade for reading below the hero
-  const fade = Math.min(0.72, sc / (H * 1.2));
-  if (fade > 0) { g.fillStyle = `rgba(10,7,22,${fade})`; g.fillRect(0, 0, W, H); }
+  const fade = Math.min(0.6, sc / (H * 1.4));
+  if (fade > 0) { g.fillStyle = `rgba(13,17,18,${fade})`; g.fillRect(0, 0, W, H); }
   if (!reduce) requestAnimationFrame(drawBg);
 }
 requestAnimationFrame(drawBg);
